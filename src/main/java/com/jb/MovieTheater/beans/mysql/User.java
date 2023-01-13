@@ -2,8 +2,8 @@ package com.jb.MovieTheater.beans.mysql;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jb.MovieTheater.beans.SuperBean;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -18,7 +18,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 @SuperBuilder()
 @MappedSuperclass
-public class User {
+public class User extends SuperBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;

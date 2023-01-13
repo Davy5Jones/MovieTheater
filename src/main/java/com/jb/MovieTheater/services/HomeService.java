@@ -1,14 +1,11 @@
 package com.jb.MovieTheater.services;
 
-import com.jb.MovieTheater.beans.mongo.Movie;
-import com.jb.MovieTheater.models.screening.ScreeningModelDto;
-
-import java.util.List;
+import com.jb.MovieTheater.exception.CustomCinemaException;
+import com.jb.MovieTheater.models.user.CustomerModelDao;
 
 public interface HomeService {
 
-    List<ScreeningModelDto> todayScreeningsByTime(int page,int size);
+    void register(CustomerModelDao customerModelDao) throws CustomCinemaException;
 
-    List<Movie> getRecommendedMovies();
 
 }

@@ -11,14 +11,10 @@ import java.util.Optional;
 
 
 @Repository
-public interface TheaterRepository extends MongoRepository<Theater,String> ,TheaterRepositoryTemplate{
+public interface TheaterRepository extends MongoRepository<Theater, String>, TheaterRepositoryTemplate {
 
-    @Query(value = "{ _id : ?0}", fields = "{name: 1}")
-    @Cacheable(cacheNames = "theaterName",value = "theaterName")
-    Theater getTheaterName(String id);
-
-    @Cacheable(cacheNames = "theaters",value = "theaters")
-    Optional<Theater> findById(String id);
+    @Cacheable(cacheNames = "theaters", value = "theaters")
+    Optional<Theater> findTheaterById(String id);
 
     boolean existsByName(String name);
 

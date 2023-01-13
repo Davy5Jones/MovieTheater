@@ -1,8 +1,9 @@
-package com.jb.MovieTheater.security;
+package com.jb.MovieTheater.controller;
 
-import com.jb.MovieTheater.beans.mongo.Movie;
-import com.jb.MovieTheater.models.screening.ScreeningModelDto;
+import com.jb.MovieTheater.exception.CustomCinemaException;
 import com.jb.MovieTheater.models.user.CustomerModelDao;
+import com.jb.MovieTheater.security.LoginBodyModel;
+import com.jb.MovieTheater.security.TokenService;
 import com.jb.MovieTheater.services.HomeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,10 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -43,8 +47,8 @@ public class HomeController {
         return tokenService.generateToken(authentication, userLogin.isStayLoggedIn());
     }
 
-    @PostMapping("login/company")
-    public String companyLogin(@RequestBody LoginBodyModel userLogin) {
+    @PostMapping("login/clerk")
+    public String clerkLogin(@RequestBody LoginBodyModel userLogin) {
         LOG.debug("Login requested for company: '{}'", userLogin.getEmail());
         Authentication authentication = clerkAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_COMPANY"))));
         return tokenService.generateToken(authentication, userLogin.isStayLoggedIn());
@@ -58,20 +62,8 @@ public class HomeController {
     }
 
     @PostMapping("register")
-    public String customerRegister(@RequestBody CustomerModelDao user) {
+    public void customerRegister(@RequestBody CustomerModelDao user) throws CustomCinemaException {
         LOG.debug("Login requested for customer: '{}'", user.getEmailAddress());
-        Authentication authentication = customerAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getEmailAddress(), user.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER"))));
-        return tokenService.generateToken(authentication,false);
+        homeService.register(user);
     }
-
-    @GetMapping("screenings/today")
-    public List<ScreeningModelDto> todayScreenings(@RequestParam int page){
-        return homeService.todayScreeningsByTime(page,10);
-    }
-
-    @GetMapping("movies/recommended")
-    List<Movie> getRecommendedMovies(){
-        return homeService.getRecommendedMovies();
-    }
-
 }

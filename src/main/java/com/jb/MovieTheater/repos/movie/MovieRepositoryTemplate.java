@@ -4,8 +4,10 @@ import com.jb.MovieTheater.beans.mongo.Movie;
 import com.jb.MovieTheater.exception.CustomCinemaException;
 import com.jb.MovieTheater.models.movie.MovieModelDao;
 
+import java.util.Optional;
+
 public interface MovieRepositoryTemplate {
-    long inactivateMovie(String movieId) throws CustomCinemaException;
+    Optional<Movie> inactivateMovie(String movieId) throws CustomCinemaException;
 
     int getMovieDurationByName(String movieName) throws CustomCinemaException;
 

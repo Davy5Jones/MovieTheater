@@ -2,14 +2,16 @@ package com.jb.MovieTheater.repos.screening;
 
 
 import com.jb.MovieTheater.beans.mongo.Screening;
-import com.jb.MovieTheater.exception.CustomCinemaException;
-import com.jb.MovieTheater.models.screening.ScreeningModelDao;
+
+import java.util.Optional;
 
 public interface ScreeningRepositoryTemplate {
 
 
     void inactivateOldScreenings();
-    Screening inactivateScreening(String screeningId);
 
-    void updateScreeningsDurationByMovieName(String movieName,int duration);
+    Optional<Screening> inactivateScreening(String screeningId);
+
+
+    void updateScreeningsDurationByMovieId(String movieId, int duration);
 }

@@ -11,22 +11,19 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 
+import java.util.Optional;
+
 public class MovieRepositoryTemplateImpl implements MovieRepositoryTemplate {
     @Autowired
     private MongoTemplate mongoTemplate;
 
 
     @Override
-    public long inactivateMovie(String movieId) throws CustomCinemaException {
+    public Optional<Movie> inactivateMovie(String movieId) throws CustomCinemaException {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(movieId));
         Update update = new Update().set("isActive", false);
-        long modifiedCount = mongoTemplate.updateFirst(query, update, Movie.class).getModifiedCount();
-
-        if (modifiedCount==0){
-            throw new CustomCinemaException(CinemaExceptionEnum.MOVIE_DOESNT_EXIST);
-        }
-        return modifiedCount;
+        return Optional.ofNullable(mongoTemplate.findAndModify(query, update, Movie.class));
     }
 
     @Override
@@ -37,15 +34,15 @@ public class MovieRepositoryTemplateImpl implements MovieRepositoryTemplate {
         if (movie != null) {
             return movie.getDuration();
         }
-       throw new CustomCinemaException(CinemaExceptionEnum.MOVIE_DOESNT_EXIST);
+        throw new CustomCinemaException(CinemaExceptionEnum.MOVIE_DOESNT_EXIST);
     }
 
-@Override
+    @Override
     public String getMovieName(String movieId) throws CustomCinemaException {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(movieId)).fields().include("name");
-        Movie movie =mongoTemplate.findOne(query, Movie.class);
-        if (movie==null){
+        Movie movie = mongoTemplate.findOne(query, Movie.class);
+        if (movie == null) {
             throw new CustomCinemaException(CinemaExceptionEnum.MOVIE_DOESNT_EXIST);
         }
         return movie.getName();
@@ -55,9 +52,9 @@ public class MovieRepositoryTemplateImpl implements MovieRepositoryTemplate {
     public Movie updateMovie(MovieModelDao movieModelDao, String movieId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(movieId));
-        Update update = new Update().set("category",movieModelDao.getCategory())
-                .set("description",movieModelDao.getDuration())
-                .set("rating",movieModelDao.getRating());
-        return mongoTemplate.findAndModify(query, update, FindAndModifyOptions.options().returnNew(true),Movie.class);
+        Update update = new Update().set("category", movieModelDao.getCategory())
+                .set("description", movieModelDao.getDuration())
+                .set("rating", movieModelDao.getRating());
+        return mongoTemplate.findAndModify(query, update, FindAndModifyOptions.options().returnNew(true), Movie.class);
     }
 }

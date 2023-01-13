@@ -19,36 +19,37 @@ import java.util.logging.Logger;
 @EnableMongoRepositories
 public class MovieTheaterApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MovieTheaterApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(MovieTheaterApplication.class, args);
+    }
 
-	@Component
-	@RequiredArgsConstructor
-	public static class ApplicationLifecycle implements Lifecycle {
-		private final PurchaseRepository purchaseRepository;
-		private final ScreeningRepository screeningRepository;
-		private final MovieRepository movieRepository;
-		private final TheaterRepository theaterRepository;
+    @Component
+    @RequiredArgsConstructor
+    public static class ApplicationLifecycle implements Lifecycle {
+        private final PurchaseRepository purchaseRepository;
+        private final ScreeningRepository screeningRepository;
+        private final MovieRepository movieRepository;
+        private final TheaterRepository theaterRepository;
 
-		Logger logger=Logger.getLogger("logger");
+        private final Logger logger = Logger.getLogger("logger");
 
-		@Override
-		public void start() {
-			logger.info("Application start");
-		}
+        @Override
+        public void start() {
+            logger.info("Application start");
+        }
 
-		@Override
-		public void stop() {
-			logger.info("Application stop");
-			purchaseRepository.deleteAll();
-			screeningRepository.deleteAll();
-			movieRepository.deleteAll();
-			theaterRepository.deleteAll();
-		}
-		@Override
-		public boolean isRunning() {
-			return true;
-		}
-	}
+        @Override
+        public void stop() {
+            logger.info("Application stop");
+            purchaseRepository.deleteAll();
+            screeningRepository.deleteAll();
+            movieRepository.deleteAll();
+            theaterRepository.deleteAll();
+        }
+
+        @Override
+        public boolean isRunning() {
+            return true;
+        }
+    }
 }

@@ -54,11 +54,11 @@ public class SecurityConfig {
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .mvcMatchers("login/**").permitAll()
+                        .mvcMatchers("home/**").permitAll()
                         .mvcMatchers("api/companies/**").hasAuthority("SCOPE_ROLE_COMPANY")
                         .mvcMatchers("api/customers/**").hasAuthority("SCOPE_ROLE_CUSTOMER")
                         .mvcMatchers("api/admin/**").hasAuthority("SCOPE_ROLE_ADMIN")
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
                 // This enables our JWT Authentication
                 .oauth2ResourceServer(oAuth2 -> oAuth2.jwt(jwtConfigurer -> {

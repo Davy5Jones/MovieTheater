@@ -17,7 +17,8 @@ public enum CinemaExceptionEnum {
     USER_NOT_FOUND("Couldn't find user"), MOVIE_IS_INACTIVE("Movie is inactive"),
     INVALID_SCREENING_DATE("Cannot add same day screenings"),
     MOVIE_HAS_ACTIVE_SCREENINGS("movie still has active screenings!"),
-    CANNOT_UPDATE_MOVIE_NAME("Movie name is not updatable");
+    CANNOT_UPDATE_MOVIE_NAME("Movie name is not updatable"), PURCHASE_DOESNT_EXIST("purchase doesnt exist!"),
+    PURCHASE_OWNED_BY_ANOTHER_CUSTOMER("Cannot request ticket of another customer!");
 
     private final String message;
 }

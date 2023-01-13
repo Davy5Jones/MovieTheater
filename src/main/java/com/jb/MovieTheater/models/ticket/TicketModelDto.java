@@ -1,5 +1,6 @@
 package com.jb.MovieTheater.models.ticket;
 
+import com.jb.MovieTheater.beans.SuperBean;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,8 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @Builder
-public class TicketModelDto {
+public class TicketModelDto extends SuperBean {
+    private String id;
     private Instant dateTime;
     private int duration;
     private String theaterName;
