@@ -6,8 +6,10 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
+@Repository
 public class TheaterRepositoryTemplateImpl implements TheaterRepositoryTemplate {
     private final MongoTemplate mongoTemplate;
 

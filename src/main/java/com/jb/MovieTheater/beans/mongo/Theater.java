@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Theater extends SuperBean {
+public class Theater {
     @MongoId
     private String id;
     @NotBlank(message = "Theater name can't be blank")

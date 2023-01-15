@@ -1,26 +1,27 @@
 package com.jb.MovieTheater.services;
 
-import com.jb.MovieTheater.beans.mongo.Movie;
 import com.jb.MovieTheater.exception.CustomCinemaException;
-import com.jb.MovieTheater.models.PageableModel;
+import com.jb.MovieTheater.models.movie.MovieModelDto;
 import com.jb.MovieTheater.models.screening.ScreeningModelDto;
 import com.jb.MovieTheater.models.ticket.TicketModelDto;
 import com.jb.MovieTheater.models.user.ClerkModelDto;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface ClerkService {
 
     TicketModelDto invalidatePurchase(String purchaseId);
 
-    List<TicketModelDto> findCustomerTicketsByEmail(String email);
 
-    PageableModel<ScreeningModelDto> todayScreenings(int page, String sortBy);
+    Page<TicketModelDto> findCustomerTicketsPageByEmail(String email, int page,int pageSize, String sortBy);
+
+    TicketModelDto findSingleUserTicket(String purchaseId) throws CustomCinemaException;
+
+    Page<ScreeningModelDto> todayScreenings(int page,int pageSize, String sortBy);
 
 
-    PageableModel<ScreeningModelDto> getActiveScreenings(int page, String sortBy);
+    Page<ScreeningModelDto> getActiveScreenings(int page,int pageSize, String sortBy);
 
     ClerkModelDto getClerkDetails(int clerkId) throws CustomCinemaException;
 
-    PageableModel<Movie> getActiveMoviesPage(int page, String sortBy);
+    Page<MovieModelDto> getActiveMoviesPage(int page,int pageSize, String sortBy);
 }

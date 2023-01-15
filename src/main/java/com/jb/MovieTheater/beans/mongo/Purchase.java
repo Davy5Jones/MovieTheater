@@ -1,6 +1,7 @@
 package com.jb.MovieTheater.beans.mongo;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 @Document("purchases")
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Data
 public class Purchase {
     @MongoId

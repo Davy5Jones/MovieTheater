@@ -1,6 +1,7 @@
 package com.jb.MovieTheater.models.screening;
 
 import com.jb.MovieTheater.beans.SuperBean;
+import com.jb.MovieTheater.beans.mongo.Screening;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,9 +31,20 @@ public class ScreeningModelDto extends SuperBean {
         this.id = id;
         this.movieId = movieId;
         this.movieName = movieName;
-        this.screenTime = LocalDateTime.ofInstant(screenTime, ZoneId.of("Asia/Tel_Aviv"));
+        this.screenTime = LocalDateTime.from(screenTime);
         this.theaterName = theaterName;
         this.is3D = is3D;
         this.isActive = isActive;
+    }
+
+    public ScreeningModelDto(Screening screening,String theaterName) {
+        this.id = screening.getId();
+        this.movieId = screening.getMovieId();
+        this.movieName = screening.getMovieName();
+        this.screenTime = LocalDateTime.from(screening.getScreenTime());
+        this.seats = screening.getSeats();
+        this.theaterName = theaterName;
+        this.is3D = screening.is3D();
+        this.isActive = screening.isActive();
     }
 }

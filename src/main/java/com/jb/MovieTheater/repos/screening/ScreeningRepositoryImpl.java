@@ -7,10 +7,12 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.Optional;
 
+@Repository
 @RequiredArgsConstructor
 public class ScreeningRepositoryImpl implements ScreeningRepositoryTemplate {
     private final MongoTemplate mongoTemplate;

@@ -1,6 +1,9 @@
 package com.jb.MovieTheater.beans;
 
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.hateoas.RepresentationModel;
 
-public class SuperBean extends RepresentationModel<SuperBean> {
+public abstract class SuperBean extends RepresentationModel<SuperBean> {
+
 }

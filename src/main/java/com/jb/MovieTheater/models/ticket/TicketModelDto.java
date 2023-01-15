@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.Instant;
 
@@ -13,7 +14,7 @@ import java.time.Instant;
 @Data
 @AllArgsConstructor
 @Builder
-public class TicketModelDto extends SuperBean {
+public class TicketModelDto extends RepresentationModel<TicketModelDto> {
     private String id;
     private Instant dateTime;
     private int duration;

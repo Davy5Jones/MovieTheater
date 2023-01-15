@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface TheaterRepository extends MongoRepository<Theater, String>, TheaterRepositoryTemplate {
 
-    @Cacheable(cacheNames = "theaters", value = "theaters")
+    //@Cacheable(cacheNames = "theaters", value = "theaters")
     Optional<Theater> findTheaterById(String id);
 
     boolean existsByName(String name);

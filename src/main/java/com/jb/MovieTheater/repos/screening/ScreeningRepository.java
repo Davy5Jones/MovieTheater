@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface ScreeningRepository extends MongoRepository<Screening, String>, ScreeningRepositoryTemplate {
 
-    @Query(value = "{ _id : ?0}", fields = "{ screenTime: 1,movieId: 1,theater: 1,duration: 1}")
+    @Query(value = "{ _id : ?0}", fields = "{ screenTime: 1,movieId: 1,theater: 1,duration: 1,movieName : 1}")
     Optional<Screening> getScreeningTimeStampAndMovieIdAndTheaterAndDuration(String screeningId);
 
 

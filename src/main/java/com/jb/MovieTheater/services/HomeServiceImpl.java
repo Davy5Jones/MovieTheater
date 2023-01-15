@@ -6,12 +6,14 @@ import com.jb.MovieTheater.exception.CustomCinemaException;
 import com.jb.MovieTheater.models.user.CustomerModelDao;
 import com.jb.MovieTheater.repos.CustomerRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
 public class HomeServiceImpl implements HomeService {
     private final CustomerRepository customerRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
     @Override
@@ -22,7 +24,7 @@ public class HomeServiceImpl implements HomeService {
         customerRepository.save(Customer.builder()
                 .name(customer.getCustomerName())
                 .email(customer.getEmailAddress())
-                .password(customer.getPassword())
+                .password(bCryptPasswordEncoder.encode(customer.getPassword()))
                 .build());
     }
 }

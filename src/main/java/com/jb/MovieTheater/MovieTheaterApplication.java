@@ -43,7 +43,7 @@ public class MovieTheaterApplication {
             logger.info("Application stop");
             purchaseRepository.deleteAll();
             screeningRepository.deleteAll();
-            movieRepository.deleteAll();
+            //movieRepository.deleteAll();
             theaterRepository.deleteAll();
         }
 

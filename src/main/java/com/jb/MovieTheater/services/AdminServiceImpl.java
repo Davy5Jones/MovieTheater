@@ -7,15 +7,10 @@ import com.jb.MovieTheater.beans.mysql.Clerk;
 import com.jb.MovieTheater.beans.mysql.Customer;
 import com.jb.MovieTheater.exception.CinemaExceptionEnum;
 import com.jb.MovieTheater.exception.CustomCinemaException;
-import com.jb.MovieTheater.models.PageableModel;
 import com.jb.MovieTheater.models.movie.MovieModelDao;
 import com.jb.MovieTheater.models.screening.ScreeningModelDao;
-import com.jb.MovieTheater.models.screening.ScreeningModelDto;
 import com.jb.MovieTheater.models.theater.TheaterModelDao;
-import com.jb.MovieTheater.models.ticket.TicketModelDto;
 import com.jb.MovieTheater.models.user.ClerkModelDao;
-import com.jb.MovieTheater.models.user.ClerkModelDto;
-import com.jb.MovieTheater.models.user.CustomerModelDto;
 import com.jb.MovieTheater.repos.ClerkRepository;
 import com.jb.MovieTheater.repos.CustomerRepository;
 import com.jb.MovieTheater.repos.movie.MovieRepository;
@@ -35,14 +30,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class AdminServiceImpl implements AdminService {
-    private final TheaterRepository theaterRepository;
     private final MovieRepository movieRepository;
+    private final TheaterRepository theaterRepository;
+
     private final ScreeningRepository screeningRepository;
     private final ClerkRepository clerkRepository;
     private final CustomerRepository customerRepository;
     private final PurchaseRepository purchaseRepository;
 
-    private final int pageSize = 16;
 
     @Override
     public Theater addTheater(TheaterModelDao theater) throws CustomCinemaException {
@@ -52,7 +47,8 @@ public class AdminServiceImpl implements AdminService {
         if (theater.getRows().size() == 0) {
             throw new CustomCinemaException(CinemaExceptionEnum.NO_THEATER_ROWS);
         }
-        return theaterRepository.save(new Theater(theater.getName(), theater.getRows()));
+        return theaterRepository
+                .save(new Theater(theater.getName(), theater.getRows()));
     }
 
     @Override
@@ -97,15 +93,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public ClerkModelDto addClerk(ClerkModelDao clerk) throws CustomCinemaException {
+    public Clerk addClerk(ClerkModelDao clerk) throws CustomCinemaException {
         if (clerkRepository.existsByEmail(clerk.getEmailAddress()))
             throw new CustomCinemaException(CinemaExceptionEnum.EMAIL_IN_USE);
-        Clerk clerkdb = clerkRepository.save(Clerk.builder()
+        return clerkRepository.save(Clerk.builder()
                 .email(clerk.getEmailAddress())
                 .password(clerk.getPassword())
                 .name(clerk.getClerkName())
                 .build());
-        return new ClerkModelDto(clerkdb.getId(), clerk.getEmailAddress(), clerk.getClerkName());
     }
 
     @Override
@@ -137,20 +132,19 @@ public class AdminServiceImpl implements AdminService {
 
 
     @Override
-    public ClerkModelDto updateClerk(ClerkModelDao clerk, int clerkId) throws CustomCinemaException {
+    public Clerk updateClerk(ClerkModelDao clerk, int clerkId) throws CustomCinemaException {
         if (!clerkRepository.existsById(clerkId)) {
             throw new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND);
         }
         if (clerkRepository.existsByEmailAndIdNot(clerk.getEmailAddress(), clerkId)) {
             throw new CustomCinemaException(CinemaExceptionEnum.EMAIL_IN_USE);
         }
-        Clerk clerk1 = clerkRepository.save(Clerk.builder()
+        return clerkRepository.save(Clerk.builder()
                 .password(clerk.getPassword())
                 .email(clerk.getEmailAddress())
                 .id(clerkId)
                 .name(clerk.getClerkName())
                 .build());
-        return new ClerkModelDto(clerk1.getId(), clerk1.getEmail(), clerk1.getName());
     }
 
     @Override
@@ -175,49 +169,24 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public PageableModel<CustomerModelDto> getCustomerPage(int page, String sortBy) {
-
-        Page<Customer> page1 = customerRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
-        int count = page1.getTotalPages();
-        List<CustomerModelDto> customerList = page1.stream().map(customer -> new CustomerModelDto(customer.getId(), customer.getEmail(), customer.getName()
-                , purchaseRepository.findAllByUserId(customer.getId())
-                .stream()
-                .map(purchase -> {
-                    Screening screening = screeningRepository.getScreeningTimeStampAndMovieIdAndTheaterAndDuration(purchase.getScreeningId()).orElseThrow();
-                    int duration = screening.getDuration();
-                    String movieName = screening.getMovieName();
-                    String email = customerRepository.getEmailById(customer.getId());
-                    return new TicketModelDto(purchase.getId(), screening.getScreenTime()
-                            , duration, theaterRepository.getTheaterNameById(screening.getTheaterId())
-                            , email, movieName
-                            , purchase.getRowId(), purchase.getSeatId(), purchase.isUsed());
-                })
-                .collect(Collectors.toList()))).collect(Collectors.toList());
-        return new PageableModel<>(count, page1.getTotalElements(), page, customerList);
+    public Page<Customer> getCustomerPage(int page,int pageSize, String sortBy) {
+        return customerRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
     @Override
-    public PageableModel<ClerkModelDto> getClerksPage(int page, String sortBy) {
-        Page<Clerk> clerks = clerkRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
-        int pages = clerks
-                .getTotalPages();
-        List<ClerkModelDto> clerkModelDtos = clerks.map(clerk -> new ClerkModelDto(clerk.getId(), clerk.getEmail(), clerk.getName())).toList();
-        return new PageableModel<>(pages, clerks.getTotalElements(), page, clerkModelDtos);
+    public Page<Clerk> getClerksPage(int page,int pageSize, String sortBy) {
+        return clerkRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
     @Override
-    public ClerkModelDto getSingleClerk(int clerkId) throws CustomCinemaException {
-        Clerk clerk = clerkRepository.findById(clerkId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND));
+    public Clerk getSingleClerk(int clerkId) throws CustomCinemaException {
 
-        return new ClerkModelDto(clerk.getId(), clerk.getEmail(), clerk.getName());
+        return clerkRepository.findById(clerkId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND));
     }
 
     @Override
-    public PageableModel<Movie> getMoviePage(int page, String sortBy) {
-        Page<Movie> page1 = movieRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
-        List<Movie> movies = page1.toList();
-        int pages = page1.getTotalPages();
-        return new PageableModel<>(pages, page1.getTotalElements(), page, movies);
+    public Page<Movie> getMoviePage(int page,int pageSize, String sortBy) {
+        return movieRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
     @Override
@@ -226,18 +195,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public PageableModel<ScreeningModelDto> getScreeningPage(int page, String sortBy) {
-        Page<Screening> screeningPage = screeningRepository
+    public Page<Screening> getScreeningPage(int page,int pageSize, String sortBy) {
+        return screeningRepository
                 .findAll(PageRequest.of(page, pageSize, Sort.by(sortBy).descending()));
-        List<ScreeningModelDto> screenings = screeningPage.stream().map(screening -> new ScreeningModelDto(screening.getId(), screening.getMovieId(), screening.getMovieName(), screening.getScreenTime(), theaterRepository
-                .getTheaterNameById(screening.getTheaterId()), screening.is3D(), screening.isActive())).collect(Collectors.toList());
-        return new PageableModel<>(screeningPage.getTotalPages(), screeningPage.getTotalElements(), page, screenings);
     }
 
     @Override
-    public ScreeningModelDto getSingleScreening(String screeningId) throws CustomCinemaException {
-        Screening screening = screeningRepository.findById(screeningId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.SCREENING_DOESNT_EXIST));
-        return new ScreeningModelDto(screening.getId(), screening.getMovieId(), screening.getMovieName(), screening.getScreenTime(), theaterRepository.getTheaterNameById(screening.getTheaterId()), screening.is3D(), screening.isActive());
+    public Screening getSingleScreening(String screeningId) throws CustomCinemaException {
+        return screeningRepository.findById(screeningId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.SCREENING_DOESNT_EXIST));
     }
 
 
