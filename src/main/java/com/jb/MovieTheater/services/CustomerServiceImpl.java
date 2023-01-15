@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -51,7 +52,7 @@ public class CustomerServiceImpl implements CustomerService {
         screening.getSeats().get(ticket.getRowId())[ticket.getSeatId()] = true;
         screeningRepository.save(screening);
 
-        return purchaseRepository.save(new Purchase(customerId, ticket.getScreeningId(), ticket.getRowId(), ticket.getSeatId()));
+        return purchaseRepository.save(new Purchase(customerId, ticket.getScreeningId(), Instant.now(), ticket.getRowId(), ticket.getSeatId(),false));
     }
 
     @Override

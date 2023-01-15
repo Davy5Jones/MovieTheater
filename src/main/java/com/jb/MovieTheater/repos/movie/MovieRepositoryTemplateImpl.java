@@ -29,12 +29,12 @@ public class MovieRepositoryTemplateImpl implements MovieRepositoryTemplate {
     }
 
     @Override
-    public int getMovieDurationByName(String movieName) throws CustomCinemaException {
+    public Movie getMovieDurationAndIdByName(String movieName) throws CustomCinemaException {
         Query query = new Query();
-        query.addCriteria(Criteria.where("name").is(movieName)).fields().include("duration");
+        query.addCriteria(Criteria.where("name").is(movieName)).fields().include("duration","id");
         Movie movie = mongoTemplate.findOne(query, Movie.class);
         if (movie != null) {
-            return movie.getDuration();
+            return movie;
         }
         throw new CustomCinemaException(CinemaExceptionEnum.MOVIE_DOESNT_EXIST);
     }

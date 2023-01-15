@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,6 +46,7 @@ public class CustomerController {
 
 
     @PostMapping("purchases")
+    @ResponseStatus(HttpStatus.CREATED)
     public TicketModelDto purchaseTicket(@RequestBody TicketModelDao ticket, Authentication authentication) throws CustomCinemaException {
         TicketModelDto ticketModelDto = ticketModelAssembler.toModel(customerService.purchaseTicket(ticket, Integer.parseInt(authentication.getName())));
         ticketModelDto.add(linkTo(methodOn(CustomerController.class).findSingleUserTicket(authentication, ticketModelDto.getId())).withSelfRel());
@@ -52,7 +54,7 @@ public class CustomerController {
     }
 
     @GetMapping("purchases")
-    public PagedModel<TicketModelDto> findAllUserTickets(Authentication authentication, @RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = "20", required = false) int pageSize) throws CustomCinemaException {
+    public PagedModel<TicketModelDto> findAllUserTickets(Authentication authentication, @RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = "5", required = false) int pageSize) throws CustomCinemaException {
         Page<Purchase> ticketsPageable = customerService.findAllUserTickets(page, pageSize, Integer.parseInt(authentication.getName()));
         PagedModel<TicketModelDto> pagedModel = pagedPurchaseResourcesAssembler.toModel(ticketsPageable, ticketModelAssembler);
         for (TicketModelDto ticketModelDto : pagedModel) {
@@ -73,6 +75,7 @@ public class CustomerController {
     public CustomerModelDto getCustomerDetails(Authentication authentication) throws CustomCinemaException {
         CustomerModelDto customerDetails = customerModelAssembler.toModel(customerService.getCustomerDetails(Integer.parseInt(authentication.getName())));
         customerDetails.add(linkTo(methodOn(CustomerController.class).getCustomerDetails(authentication)).withSelfRel());
+        customerDetails.add(linkTo(methodOn(CustomerController.class).findAllUserTickets(authentication,0,5)).withRel("tickets"));
         return customerDetails;
     }
 
@@ -81,7 +84,7 @@ public class CustomerController {
         List<MovieModelDto> recommendedMovies = customerService.getRecommendedMovies().stream().map(movieModelAssembler::toModel).collect(Collectors.toList());
         for (MovieModelDto movie : recommendedMovies) {
             movie.add(linkTo(methodOn(CustomerController.class).getSingleMovie(movie.getId())).withSelfRel());
-            movie.add(linkTo(methodOn(CustomerController.class).getActiveScreeningsPageByMovie(0, 20, movie.getName(), null)).withRel("screenings"));
+            movie.add(linkTo(methodOn(CustomerController.class).getActiveScreeningsPageByMovie(0, 20, movie.getName(), "")).withRel("screenings"));
         }
         return recommendedMovies;
     }
@@ -90,14 +93,14 @@ public class CustomerController {
     public MovieModelDto getSingleMovie(@PathVariable String movieId) throws CustomCinemaException {
         MovieModelDto movie = movieModelAssembler.toModel(customerService.getSingleMovie(movieId));
         movie.add(linkTo(methodOn(CustomerController.class).getSingleMovie(movie.getId())).withSelfRel());
-        movie.add(linkTo(methodOn(CustomerController.class).getActiveScreeningsPageByMovie(0, 20, movie.getName(), null)).withRel("screenings"));
+        movie.add(linkTo(methodOn(CustomerController.class).getActiveScreeningsPageByMovie(0, 20, movie.getName(), "")).withRel("screenings"));
         return movie;
     }
 
     @GetMapping("screenings")
-    public PagedModel<ScreeningModelDto> getActiveScreeningsPage(@RequestParam(value = "0", required = false) int page, @RequestParam(value = "0", required = false) int pageSize, @RequestParam(value = "screenTime", required = false) String sortBy) throws CustomCinemaException {
-        Page<Screening> screeningsPage = customerService.getActiveScreeningsPage(page, pageSize, sortBy);
-        PagedModel<ScreeningModelDto> pagedModel = pagedScreeningMovieResourcesAssembler.toModel(screeningsPage, screeningModelAssembler);
+    public PagedModel<ScreeningModelDto> getActiveScreeningsPage(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = "5", required = false) int size, @RequestParam(defaultValue = "screenTime", required = false) String sort) throws CustomCinemaException {
+        Page<Screening> screeningsPage = customerService.getActiveScreeningsPage(page, size, sort);
+        PagedModel<ScreeningModelDto> pagedModel = pagedScreeningMovieResourcesAssembler.toModel(screeningsPage, screeningModelAssembler,linkTo(methodOn(CustomerController.class).getActiveScreeningsPage(page,size,sort)).withSelfRel());
         for (ScreeningModelDto screening : pagedModel) {
             screening.add(linkTo(methodOn(CustomerController.class).getSingleScreening(screening.getId())).withSelfRel());
             screening.add(linkTo(methodOn(CustomerController.class).getSingleMovie(screening.getMovieId())).withRel("movie"));
@@ -115,9 +118,10 @@ public class CustomerController {
     }
 
     @GetMapping("screenings/by/movie")
-    PagedModel<ScreeningModelDto> getActiveScreeningsPageByMovie(@RequestParam(value = "0", required = false) int page, @RequestParam(value = "0", required = false) int pageSize, @RequestParam String movieName, @RequestParam(value = "screenTime", required = false) String sortBy) throws CustomCinemaException {
-        Page<Screening> screenings = customerService.getActiveScreeningsPageByMovie(page, pageSize, movieName, sortBy);
-        PagedModel<ScreeningModelDto> screeningModelDtos = pagedScreeningMovieResourcesAssembler.toModel(screenings, screeningModelAssembler);
+    PagedModel<ScreeningModelDto> getActiveScreeningsPageByMovie(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = "5", required = false) int size, @RequestParam String movieName, @RequestParam(defaultValue = "screenTime", required = false) String sort) throws CustomCinemaException {
+        Page<Screening> screenings = customerService.getActiveScreeningsPageByMovie(page, size, movieName, sort);
+        PagedModel<ScreeningModelDto> screeningModelDtos = pagedScreeningMovieResourcesAssembler.toModel(screenings, screeningModelAssembler,linkTo(methodOn(CustomerController.class).getActiveMoviesPage(0,5,sort)).withSelfRel());
+
         for (ScreeningModelDto screening : screeningModelDtos) {
             screening.add(linkTo(methodOn(CustomerController.class).getSingleScreening(screening.getId())).withSelfRel());
             screening.add(linkTo(methodOn(CustomerController.class).getSingleMovie(screening.getMovieId())).withRel("movie"));
@@ -125,13 +129,13 @@ public class CustomerController {
         return screeningModelDtos;
     }
 
-    @GetMapping("movies/{movieId}")
-    PagedModel<MovieModelDto> getActiveMoviesPage(@RequestParam(value = "0", required = false) int page, @RequestParam(value = "0", required = false) int pageSize, @RequestParam(defaultValue = "name", required = false) String sortBy) throws CustomCinemaException {
+    @GetMapping("movies")
+    PagedModel<MovieModelDto> getActiveMoviesPage(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = "5", required = false) int pageSize, @RequestParam(defaultValue = "name", required = false) String sortBy) throws CustomCinemaException {
         Page<Movie> moviePage = customerService.getActiveMoviesPage(page, pageSize, sortBy);
         PagedModel<MovieModelDto> pagedModel = pagedMovieResourcesAssembler.toModel(moviePage, movieModelAssembler);
         for (MovieModelDto movieModelDto : pagedModel) {
             movieModelDto.add(linkTo(methodOn(CustomerController.class).getSingleMovie(movieModelDto.getId())).withSelfRel());
-            movieModelDto.add(linkTo(methodOn(CustomerController.class).getActiveScreeningsPageByMovie(0, 20, movieModelDto.getName(), null)).withSelfRel());
+            movieModelDto.add(linkTo(methodOn(CustomerController.class).getActiveScreeningsPageByMovie(0, pageSize, movieModelDto.getName(), "")).withSelfRel());
         }
 
         return pagedModel;

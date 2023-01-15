@@ -1,6 +1,7 @@
 package com.jb.MovieTheater.services;
 
 import com.jb.MovieTheater.beans.mongo.Movie;
+import com.jb.MovieTheater.beans.mongo.Purchase;
 import com.jb.MovieTheater.beans.mongo.Screening;
 import com.jb.MovieTheater.beans.mongo.Theater;
 import com.jb.MovieTheater.beans.mysql.Clerk;
@@ -35,16 +36,23 @@ public interface AdminService {
     void deleteClerk(int clerkId) throws CustomCinemaException;
 
     Page<Customer> getCustomerPage(int page,int pageSize, String sortBy);
+    Customer getSingleCustomer(int customerId) throws CustomCinemaException;
+
 
     Page<Clerk> getClerksPage(int page,int pageSize, String sortBy);
 
     Clerk getSingleClerk(int clerkId) throws CustomCinemaException;
 
     Page<Movie> getMoviePage(int page,int pageSize, String sortBy);
+    Page<Screening> getScreeningsPageByMovie(int page,int pageSize, String movieId, String sortBy);
+
 
     Movie getSingleMovie(String movieId) throws CustomCinemaException;
 
     Page<Screening> getScreeningPage(int page,int pageSize, String sortBy);
 
     Screening getSingleScreening(String screeningId) throws CustomCinemaException;
+
+    Page<Purchase> getPurchasePage(int page,int pageSize, String sortBy);
+    Purchase getSinglePurchase(String purchaseId) throws CustomCinemaException;
 }

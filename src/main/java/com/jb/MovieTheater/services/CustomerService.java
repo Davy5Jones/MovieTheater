@@ -30,7 +30,7 @@ public interface CustomerService {
 
     Screening getSingleScreening(String screeningId) throws CustomCinemaException;
 
-    Page<Screening> getActiveScreeningsPageByMovie(int page,int pageSize, String movieName, String sortBy);
+    Page<Screening> getActiveScreeningsPageByMovie(int page,int pageSize, String movieId, String sortBy);
 
     Page<Movie> getActiveMoviesPage(int page,int pageSize, String sortBy);
 

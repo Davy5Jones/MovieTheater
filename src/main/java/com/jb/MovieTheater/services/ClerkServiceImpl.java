@@ -42,9 +42,10 @@ public class ClerkServiceImpl implements ClerkService {
         Screening screening = screeningRepository.getScreeningTimeStampAndMovieIdAndTheaterAndDuration(purchase.getScreeningId()).orElseThrow();
         int duration = screening.getDuration();
         String email = customerRepository.getEmailById(purchase.getUserId());
-        return new TicketModelDto(purchase.getId(), screening.getScreenTime()
-                , duration, theaterRepository.getTheaterNameById(screening.getTheaterId())
-                , email, screening.getMovieName()
+        return new TicketModelDto(purchase.getId(),screening.getScreenTime()
+                ,purchase.getPurchaseTime(),
+                duration,theaterRepository.getTheaterNameById(screening.getTheaterId()),email
+        ,purchase.getUserId(), screening.getMovieName()
                 , purchase.getRowId(), purchase.getSeatId(), purchase.isUsed());
     }
 
@@ -57,9 +58,9 @@ public class ClerkServiceImpl implements ClerkService {
                 .map(purchase -> {
                     Screening screening = screeningRepository.getScreeningTimeStampAndMovieIdAndTheaterAndDuration(purchase.getScreeningId()).orElseThrow();
                     int duration = screening.getDuration();
-                    return new TicketModelDto(purchase.getId(), screening.getScreenTime()
+                    return new TicketModelDto(purchase.getId(), screening.getScreenTime(),purchase.getPurchaseTime()
                             , duration, theaterRepository.getTheaterNameById(screening.getTheaterId())
-                            , email, screening.getMovieName()
+                            , email, purchase.getUserId(), screening.getMovieName()
                             , purchase.getRowId(), purchase.getSeatId(), purchase.isUsed());
                 });
     }
@@ -70,9 +71,9 @@ public class ClerkServiceImpl implements ClerkService {
         Screening screening = screeningRepository.getScreeningTimeStampAndMovieIdAndTheaterAndDuration(purchase.getScreeningId()).orElseThrow();
         int duration = screening.getDuration();
         String email = customerRepository.getEmailById(purchase.getUserId());
-        return new TicketModelDto(purchase.getId(), screening.getScreenTime()
+        return new TicketModelDto(purchase.getId(), screening.getScreenTime(),purchase.getPurchaseTime()
                 , duration, theaterRepository.getTheaterNameById(screening.getTheaterId())
-                , email, screening.getMovieName()
+                , email, purchase.getUserId(), screening.getMovieName()
                 , purchase.getRowId(), purchase.getSeatId(), purchase.isUsed());
     }
 
