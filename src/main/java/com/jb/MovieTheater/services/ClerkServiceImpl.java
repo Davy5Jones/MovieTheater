@@ -1,15 +1,9 @@
 package com.jb.MovieTheater.services;
 
-import com.jb.MovieTheater.beans.mongo.Movie;
 import com.jb.MovieTheater.beans.mongo.Purchase;
-import com.jb.MovieTheater.beans.mongo.Screening;
 import com.jb.MovieTheater.beans.mysql.Clerk;
 import com.jb.MovieTheater.exception.CinemaExceptionEnum;
 import com.jb.MovieTheater.exception.CustomCinemaException;
-import com.jb.MovieTheater.models.movie.MovieModelDto;
-import com.jb.MovieTheater.models.screening.ScreeningModelDto;
-import com.jb.MovieTheater.models.ticket.TicketModelDto;
-import com.jb.MovieTheater.models.user.ClerkModelDto;
 import com.jb.MovieTheater.repos.ClerkRepository;
 import com.jb.MovieTheater.repos.CustomerRepository;
 import com.jb.MovieTheater.repos.movie.MovieRepository;
@@ -22,10 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
-
 @RequiredArgsConstructor
 @Service
 public class ClerkServiceImpl implements ClerkService {
@@ -37,73 +27,24 @@ public class ClerkServiceImpl implements ClerkService {
     private final CustomerRepository customerRepository;
 
     @Override
-    public TicketModelDto invalidatePurchase(String purchaseId) {
-        Purchase purchase = purchaseRepository.invalidatePurchase(purchaseId);
-        Screening screening = screeningRepository.getScreeningTimeStampAndMovieIdAndTheaterAndDuration(purchase.getScreeningId()).orElseThrow();
-        int duration = screening.getDuration();
-        String email = customerRepository.getEmailById(purchase.getUserId());
-        return new TicketModelDto(purchase.getId(),screening.getScreenTime()
-                ,purchase.getPurchaseTime(),
-                duration,theaterRepository.getTheaterNameById(screening.getTheaterId()),email
-        ,purchase.getUserId(), screening.getMovieName()
-                , purchase.getRowId(), purchase.getSeatId(), purchase.isUsed());
+    public Purchase invalidatePurchase(String purchaseId) throws CustomCinemaException {
+        return purchaseRepository.invalidatePurchase(purchaseId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.PURCHASE_DOESNT_EXIST));
     }
 
     @Override
-    public Page<TicketModelDto> findCustomerTicketsPageByEmail(String email, int page,int pageSize, String sortBy) {
-        int customerId = customerRepository.getIdByEmail(email);
-        Page<Purchase> pager = purchaseRepository.findAllByUserId(customerId, PageRequest.of(page, pageSize, Sort.by(sortBy)));
-
-        return pager
-                .map(purchase -> {
-                    Screening screening = screeningRepository.getScreeningTimeStampAndMovieIdAndTheaterAndDuration(purchase.getScreeningId()).orElseThrow();
-                    int duration = screening.getDuration();
-                    return new TicketModelDto(purchase.getId(), screening.getScreenTime(),purchase.getPurchaseTime()
-                            , duration, theaterRepository.getTheaterNameById(screening.getTheaterId())
-                            , email, purchase.getUserId(), screening.getMovieName()
-                            , purchase.getRowId(), purchase.getSeatId(), purchase.isUsed());
-                });
+    public Page<Purchase> findCustomerTicketsPageByEmail(String email, int page, int pageSize, String sortBy) throws CustomCinemaException {
+        int customerId = customerRepository.getIdByEmail(email).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND));
+        return purchaseRepository.findAllByUserId(customerId, PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
     @Override
-    public TicketModelDto findSingleUserTicket(String purchaseId) throws CustomCinemaException {
-        Purchase purchase = purchaseRepository.findById(purchaseId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.PURCHASE_DOESNT_EXIST));
-        Screening screening = screeningRepository.getScreeningTimeStampAndMovieIdAndTheaterAndDuration(purchase.getScreeningId()).orElseThrow();
-        int duration = screening.getDuration();
-        String email = customerRepository.getEmailById(purchase.getUserId());
-        return new TicketModelDto(purchase.getId(), screening.getScreenTime(),purchase.getPurchaseTime()
-                , duration, theaterRepository.getTheaterNameById(screening.getTheaterId())
-                , email, purchase.getUserId(), screening.getMovieName()
-                , purchase.getRowId(), purchase.getSeatId(), purchase.isUsed());
+    public Purchase findSingleUserTicket(String purchaseId) throws CustomCinemaException {
+        return purchaseRepository.findById(purchaseId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.PURCHASE_DOESNT_EXIST));
     }
 
     @Override
-    public Page<ScreeningModelDto> todayScreenings(int page,int pageSize, String sortBy) {
-        Page<Screening> page1 = screeningRepository
-                .findScreeningsByScreenTimeBetweenAndActive(Instant.ofEpochMilli(LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.ofHours(0))), Instant.ofEpochMilli(LocalDate.now().plusDays(1)
-                        .atStartOfDay().toEpochSecond(ZoneOffset.ofHours(0))), PageRequest.of(page, pageSize, Sort.by(sortBy).descending()));
-
-        return page1.map(screening ->
-                new ScreeningModelDto(screening.getId(), screening.getMovieId(), screening.getMovieName(), screening.getScreenTime(), theaterRepository.getTheaterNameById(screening.getTheaterId()), screening.is3D(), screening.isActive()));
-    }
-
-    @Override
-    public Page<ScreeningModelDto> getActiveScreenings(int page,int pageSize, String sortBy) {
-        Page<Screening> screeningsPage = screeningRepository.findAllByActive(PageRequest.of(page, pageSize, Sort.by(sortBy).descending()));
-        return screeningsPage.map(screening ->
-                new ScreeningModelDto(screening.getId(), screening.getMovieId(), screening.getMovieName(), screening.getScreenTime(), theaterRepository.getTheaterNameById(screening.getTheaterId()), screening.is3D(), screening.isActive()));
-    }
-
-    @Override
-    public Page<MovieModelDto> getActiveMoviesPage(int page,int pageSize, String sortBy) {
-        Page<Movie> moviePage = movieRepository.findAllByActive(PageRequest.of(page, pageSize, Sort.by(sortBy)));
-        return moviePage.map(MovieModelDto::new);
-    }
-
-    @Override
-    public ClerkModelDto getClerkDetails(int clerkId) throws CustomCinemaException {
-        Clerk clerk = clerkRepository.findById(clerkId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND));
-        return new ClerkModelDto(clerk.getId(), clerk.getEmail(), clerk.getName());
+    public Clerk getClerkDetails(int clerkId) throws CustomCinemaException {
+        return clerkRepository.findById(clerkId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND));
     }
 
 

@@ -27,7 +27,7 @@ public interface ScreeningRepository extends MongoRepository<Screening, String>,
     Page<Screening> findAllByActive(Pageable pageable);
 
     @Query(value = "{isActive : true,movieId: ?0}")
-    Page<Screening> findAllByActiveAndMovieId(String movieName, Pageable pageable);
+    Page<Screening> findAllByActiveAndMovieId(String movieId, Pageable pageable);
 
     @Query(value = "{ movieId: ?0, isActive : true}", exists = true)
     boolean existsByMovieIdAndActive(String movieId);

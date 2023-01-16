@@ -21,7 +21,7 @@ public class ScreeningModelDto extends SuperBean {
     private String id;
     private String movieId;
     private String movieName;
-    private LocalDateTime screenTime;
+    private Instant screenTime;
     private List<boolean[]> seats;
     private String theaterName;
     private boolean is3D;
@@ -31,20 +31,10 @@ public class ScreeningModelDto extends SuperBean {
         this.id = id;
         this.movieId = movieId;
         this.movieName = movieName;
-        this.screenTime = LocalDateTime.from(screenTime);
+        this.screenTime = screenTime;
         this.theaterName = theaterName;
         this.is3D = is3D;
         this.isActive = isActive;
     }
 
-    public ScreeningModelDto(Screening screening,String theaterName) {
-        this.id = screening.getId();
-        this.movieId = screening.getMovieId();
-        this.movieName = screening.getMovieName();
-        this.screenTime = LocalDateTime.from(screening.getScreenTime());
-        this.seats = screening.getSeats();
-        this.theaterName = theaterName;
-        this.is3D = screening.is3D();
-        this.isActive = screening.isActive();
-    }
 }

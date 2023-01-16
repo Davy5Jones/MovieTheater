@@ -10,6 +10,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 
 public class PurchaseRepositoryTemplateImpl implements PurchaseRepositoryTemplate{
@@ -19,10 +21,10 @@ public class PurchaseRepositoryTemplateImpl implements PurchaseRepositoryTemplat
 
 
     @Override
-    public Purchase invalidatePurchase(String purchaseId) {
+    public Optional<Purchase> invalidatePurchase(String purchaseId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(purchaseId));
         Update update = new Update().set("used",true);
-        return mongoTemplate.findAndModify(query,update, FindAndModifyOptions.options().returnNew(true),Purchase.class);
+        return Optional.ofNullable(mongoTemplate.findAndModify(query,update, FindAndModifyOptions.options().returnNew(true),Purchase.class));
     }
 }

@@ -23,7 +23,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("home")
+@RequestMapping("api")
 public class HomeController {
     private static final Logger LOG = LoggerFactory.getLogger(HomeController.class);
     private final AuthenticationManager clerkAuthenticationManager;
@@ -43,7 +43,8 @@ public class HomeController {
     @PostMapping("login/customer")
     public String customerLogin(@RequestBody LoginBodyModel userLogin) {
         LOG.debug("Login requested for customer: '{}'", userLogin.getEmail());
-        Authentication authentication = customerAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER"))));
+        Authentication authentication = customerAuthenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_CUSTOMER"))));
         return tokenService.generateToken(authentication, userLogin.isStayLoggedIn());
     }
 
@@ -57,7 +58,8 @@ public class HomeController {
     @PostMapping("login/admin")
     public String adminLogin(@RequestBody LoginBodyModel userLogin) {
         LOG.debug("Login requested for admin: '{}'", userLogin.getEmail());
-        Authentication authentication = adminAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
+        Authentication authentication = adminAuthenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_ADMIN"))));
         return tokenService.generateToken(authentication, userLogin.isStayLoggedIn());
     }
 

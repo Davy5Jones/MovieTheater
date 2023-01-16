@@ -20,7 +20,7 @@ public interface MovieRepository extends MongoRepository<Movie, String>, MovieRe
     @Query(value = "{ name : ?0, isActive : true}", exists = true)
     boolean getMovieIsActiveByName(String movieName);
 
-    List<Movie> findTop5ByIsActiveOrderByRating(boolean is);
+    List<Movie> findTop5ByIsActiveOrderByRatingDesc(boolean is);
 
     @Query(value = "{ isActive : true}", exists = true)
     Page<Movie> findAllByActive(Pageable pageable);

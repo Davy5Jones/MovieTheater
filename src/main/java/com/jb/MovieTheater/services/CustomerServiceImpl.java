@@ -92,14 +92,18 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<Screening> getActiveScreeningsPageByMovie(int page,int pageSize, String movieId, String sortBy) {
+    public Page<Screening> getActiveScreeningsPageByMovie(int page,int size, String movieId, String sort) {
         return screeningRepository
-                .findAllByActiveAndMovieId(movieId, PageRequest.of(page, pageSize, Sort.by(sortBy)));
+                        .findAllByActiveAndMovieId(movieId, PageRequest.of(page, size, Sort.by(sort)));
     }
 
     @Override
-    public Page<Movie> getActiveMoviesPage(int page,int pageSize, String sortBy) {
-        return movieRepository.findAllByActive(PageRequest.of(page, pageSize, Sort.by(sortBy)));
+    //@Cacheable(value = "movies", cacheNames = "movies",condition = "#page<3&&#pageSize==5&&#sort=='name'")
+    public Page<Movie> getActiveMoviesPage(int page,int pageSize, String sort) {
+        Page<Movie> allByActive = movieRepository.findAllByActive(PageRequest.of(page, pageSize, Sort.by(sort)));
+        System.out.println(allByActive.getSort());
+        return
+                allByActive;
     }
 
     @Override
@@ -114,7 +118,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Cacheable(value = "recommendedMovies", cacheNames = "recommendedMovies")
     public List<Movie> getRecommendedMovies() {
-        return movieRepository.findTop5ByIsActiveOrderByRating(true);
+        return movieRepository.findTop5ByIsActiveOrderByRatingDesc(true);
     }
 
 }
