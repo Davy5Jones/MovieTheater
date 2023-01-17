@@ -1,6 +1,5 @@
 package com.jb.MovieTheater.beans.mongo;
 
-import com.jb.MovieTheater.beans.SuperBean;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

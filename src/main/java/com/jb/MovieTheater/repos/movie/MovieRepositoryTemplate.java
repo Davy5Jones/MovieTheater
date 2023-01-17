@@ -12,6 +12,7 @@ public interface MovieRepositoryTemplate {
     Movie getMovieDurationAndIdByName(String movieName) throws CustomCinemaException;
 
     String getMovieName(String movieId) throws CustomCinemaException;
+
     Movie updateMovie(MovieModelDao movieModelDao, String movieId);
 
 }

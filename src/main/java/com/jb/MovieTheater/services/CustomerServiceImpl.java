@@ -52,11 +52,11 @@ public class CustomerServiceImpl implements CustomerService {
         screening.getSeats().get(ticket.getRowId())[ticket.getSeatId()] = true;
         screeningRepository.save(screening);
 
-        return purchaseRepository.save(new Purchase(customerId, ticket.getScreeningId(), Instant.now(), ticket.getRowId(), ticket.getSeatId(),false));
+        return purchaseRepository.save(new Purchase(customerId, ticket.getScreeningId(), Instant.now(), ticket.getRowId(), ticket.getSeatId(), false));
     }
 
     @Override
-    public Page<Purchase> findAllUserTickets(int page,int pageSize, int customerId) {
+    public Page<Purchase> findAllUserTickets(int page, int pageSize, int customerId) {
         return purchaseRepository.findAllByUserId(customerId, PageRequest.of(page, pageSize));
 
     }
@@ -77,7 +77,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<Screening> getActiveScreeningsPage(int page,int pageSize, String sortBy) {
+    public Page<Screening> getActiveScreeningsPage(int page, int pageSize, String sortBy) {
 
         return screeningRepository.findAllByActive(PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
@@ -92,14 +92,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<Screening> getActiveScreeningsPageByMovie(int page,int size, String movieId, String sort) {
+    public Page<Screening> getActiveScreeningsPageByMovie(int page, int size, String movieId, String sort) {
         return screeningRepository
-                        .findAllByActiveAndMovieId(movieId, PageRequest.of(page, size, Sort.by(sort)));
+                .findAllByActiveAndMovieId(movieId, PageRequest.of(page, size, Sort.by(sort)));
     }
 
     @Override
     //@Cacheable(value = "movies", cacheNames = "movies",condition = "#page<3&&#pageSize==5&&#sort=='name'")
-    public Page<Movie> getActiveMoviesPage(int page,int pageSize, String sort) {
+    public Page<Movie> getActiveMoviesPage(int page, int pageSize, String sort) {
         Page<Movie> allByActive = movieRepository.findAllByActive(PageRequest.of(page, pageSize, Sort.by(sort)));
         System.out.println(allByActive.getSort());
         return

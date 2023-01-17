@@ -3,10 +3,6 @@ package com.jb.MovieTheater.services;
 import com.jb.MovieTheater.beans.mongo.Purchase;
 import com.jb.MovieTheater.beans.mysql.Clerk;
 import com.jb.MovieTheater.exception.CustomCinemaException;
-import com.jb.MovieTheater.models.movie.MovieModelDto;
-import com.jb.MovieTheater.models.screening.ScreeningModelDto;
-import com.jb.MovieTheater.models.ticket.TicketModelDto;
-import com.jb.MovieTheater.models.user.ClerkModelDto;
 import org.springframework.data.domain.Page;
 
 public interface ClerkService {

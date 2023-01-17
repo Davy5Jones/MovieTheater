@@ -23,7 +23,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -48,17 +47,17 @@ public class AdminController {
     private final TheaterModelAssembler theaterModelAssembler;
     private final ClerkModelAssembler clerkModelAssembler;
 
-    private final String defaultPageSize="5";
+    private final String defaultPageSize = "5";
 
 
     @PostMapping("theaters")
     @ResponseStatus(HttpStatus.CREATED)
     public TheaterModelDto addTheater(@RequestBody TheaterModelDao theater) throws CustomCinemaException {
-        TheaterModelDto theaterModelDto = theaterModelAssembler.toModel(adminService.addTheater(theater));
 
-        return theaterModelDto;
+        return theaterModelAssembler.toModel(adminService.addTheater(theater));
         //todo add get single theater
     }
+
     @PostMapping("movies")
     @ResponseStatus(HttpStatus.CREATED)
     public MovieModelDto addMovie(@RequestBody MovieModelDao movie) throws CustomCinemaException {
@@ -66,6 +65,7 @@ public class AdminController {
         movieModelDto.add(linkTo(methodOn(AdminController.class).getSingleMovie(movieModelDto.getId())).withSelfRel());
         return movieModelDto;
     }
+
     @PostMapping("screenings")
     @ResponseStatus(HttpStatus.CREATED)
     public ScreeningModelDto addScreening(@RequestBody ScreeningModelDao screening) throws CustomCinemaException {
@@ -74,6 +74,7 @@ public class AdminController {
         return
                 screeningModelDto;
     }
+
     @PostMapping("clerks")
     @ResponseStatus(HttpStatus.CREATED)
     public ClerkModelDto addClerk(@RequestBody ClerkModelDao clerk) throws CustomCinemaException {
@@ -81,20 +82,21 @@ public class AdminController {
         clerkModelDto.add(linkTo(methodOn(AdminController.class).getSingleClerk(clerkModelDto.getId())).withSelfRel());
         return clerkModelDto;
     }
+
     @PutMapping("theaters/{theaterId}")
-    public TheaterModelDto updateTheater(@RequestBody TheaterModelDao theater,@PathVariable String theaterId) throws CustomCinemaException {
+    public TheaterModelDto updateTheater(@RequestBody TheaterModelDao theater, @PathVariable String theaterId) throws CustomCinemaException {
         return theaterModelAssembler.toModel(adminService.updateTheater(theater, theaterId));
     }
+
     @PutMapping("movies/{movieId}")
-    public MovieModelDto updateMovie(@RequestBody MovieModelDao movie,@PathVariable String movieId) throws CustomCinemaException {
+    public MovieModelDto updateMovie(@RequestBody MovieModelDao movie, @PathVariable String movieId) throws CustomCinemaException {
         MovieModelDto movieModelDto = movieModelAssembler.toModel(adminService.updateMovie(movie, movieId));
         movieModelDto.add(linkTo(methodOn(AdminController.class).getSingleMovie(movieModelDto.getId())).withSelfRel());
-
         return movieModelDto;
     }
 
     @PutMapping("clerks/{clerkId}")
-    public ClerkModelDto updateClerk(@RequestBody ClerkModelDao clerk,@PathVariable int clerkId) throws CustomCinemaException {
+    public ClerkModelDto updateClerk(@RequestBody ClerkModelDao clerk, @PathVariable int clerkId) throws CustomCinemaException {
         ClerkModelDto clerkModelDto = clerkModelAssembler.toModel(adminService.updateClerk(clerk, clerkId));
         clerkModelDto.add(linkTo(methodOn(AdminController.class).getSingleClerk(clerkModelDto.getId())).withSelfRel());
 
@@ -105,9 +107,10 @@ public class AdminController {
     public MovieModelDto inactivateMovie(@PathVariable String movieId) throws CustomCinemaException {
         MovieModelDto movieModelDto = movieModelAssembler.toModel(adminService.inactivateMovie(movieId));
         movieModelDto.add(linkTo(methodOn(AdminController.class).getSingleMovie(movieModelDto.getId())).withSelfRel());
-        movieModelDto.add(linkTo(methodOn(AdminController.class).getScreeningPageByMovieId(0, 20, movieModelDto.getId(),null)).withSelfRel());
+        movieModelDto.add(linkTo(methodOn(AdminController.class).getScreeningPageByMovieId(0, 20, movieModelDto.getId(), "")).withSelfRel());
         return movieModelDto;
     }
+
     @PutMapping("screenings/inactivate/{screeningId}")
     public ScreeningModelDto inactivateScreening(@PathVariable String screeningId) throws CustomCinemaException {
         ScreeningModelDto screeningModelDto = screeningModelAssembler.toModel(adminService.inactivateScreening(screeningId));
@@ -115,12 +118,14 @@ public class AdminController {
         screeningModelDto.add(linkTo(methodOn(AdminController.class).getSingleMovie(screeningModelDto.getMovieId())).withRel("movie"));
         return screeningModelDto;
     }
+
     @DeleteMapping("clerks/{clerkId}")
     public void deleteClerk(@PathVariable int clerkId) throws CustomCinemaException {
         adminService.deleteClerk(clerkId);
     }
+
     @GetMapping("customers")
-    public PagedModel<CustomerModelDto> getCustomerPage(@RequestParam(defaultValue = "0",required = false) int page, @RequestParam(required = false,defaultValue = defaultPageSize) int size, @RequestParam(required = false,defaultValue = "name") String sort) throws CustomCinemaException {
+    public PagedModel<CustomerModelDto> getCustomerPage(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(required = false, defaultValue = defaultPageSize) int size, @RequestParam(required = false, defaultValue = "name") String sort) throws CustomCinemaException {
         Page<Customer> customerPage = adminService.getCustomerPage(page, size, sort.split(",")[0]);
         PagedModel<CustomerModelDto> customerModelDtos = pagedCustomerResourcesAssembler.toModel(customerPage, customerModelAssembler);
         for (CustomerModelDto customerModelDto : customerModelDtos) {
@@ -128,14 +133,16 @@ public class AdminController {
         }
         return customerModelDtos;
     }
+
     @GetMapping("customers/{customerId}")
     public CustomerModelDto getSingleCustomer(@PathVariable int customerId) throws CustomCinemaException {
         CustomerModelDto customerModelDto = customerModelAssembler.toModel(adminService.getSingleCustomer(customerId));
         customerModelDto.add(linkTo(methodOn(AdminController.class).getSingleCustomer(customerModelDto.getId())).withSelfRel());
         return customerModelDto;
     }
+
     @GetMapping("clerks")
-    public PagedModel<ClerkModelDto> getClerksPage(@RequestParam(defaultValue = "0",required = false) int page, @RequestParam(required = false,defaultValue = defaultPageSize) int size, @RequestParam(required = false,defaultValue = "name") String sort) throws CustomCinemaException {
+    public PagedModel<ClerkModelDto> getClerksPage(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(required = false, defaultValue = defaultPageSize) int size, @RequestParam(required = false, defaultValue = "name") String sort) throws CustomCinemaException {
         Page<Clerk> clerkPage = adminService.getClerksPage(page, size, sort.split(",")[0]);
         PagedModel<ClerkModelDto> clerkModelDtos = pagedClerkResourcesAssembler.toModel(clerkPage, clerkModelAssembler);
         for (ClerkModelDto clerkModelDto : clerkModelDtos) {
@@ -153,7 +160,7 @@ public class AdminController {
     }
 
     @GetMapping("movies")
-    public PagedModel<MovieModelDto> getMoviePage(@RequestParam(defaultValue = "0",required = false) int page, @RequestParam(required = false,defaultValue = defaultPageSize) int size, @RequestParam(required = false,defaultValue = "name") String sort) throws CustomCinemaException {
+    public PagedModel<MovieModelDto> getMoviePage(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(required = false, defaultValue = defaultPageSize) int size, @RequestParam(required = false, defaultValue = "name") String sort) throws CustomCinemaException {
         Page<Movie> moviePage = adminService.getMoviePage(page, size, sort.split(",")[0]);
         PagedModel<MovieModelDto> pagedModel = pagedMovieResourcesAssembler.toModel(moviePage, movieModelAssembler);
         for (MovieModelDto movie : pagedModel) {
@@ -164,7 +171,7 @@ public class AdminController {
     }
 
     @GetMapping("screenings/by/movie/{movieId}")
-    public PagedModel<ScreeningModelDto> getScreeningPageByMovieId(@RequestParam(defaultValue = "0",required = false) int page, @RequestParam(required = false,defaultValue = defaultPageSize) int size, @PathVariable String movieId, @RequestParam(required = false,defaultValue = "name") String sort) throws CustomCinemaException {
+    public PagedModel<ScreeningModelDto> getScreeningPageByMovieId(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(required = false, defaultValue = defaultPageSize) int size, @PathVariable String movieId, @RequestParam(required = false, defaultValue = "name") String sort) throws CustomCinemaException {
         Page<Screening> screeningPage = adminService.getScreeningsPageByMovie(page, size, movieId, sort.split(",")[0]);
         PagedModel<ScreeningModelDto> screeningModelDtos = pagedScreeningMovieResourcesAssembler.toModel(screeningPage, screeningModelAssembler);
         for (ScreeningModelDto screening : screeningModelDtos) {
@@ -178,11 +185,12 @@ public class AdminController {
     public MovieModelDto getSingleMovie(@PathVariable String movieId) throws CustomCinemaException {
         MovieModelDto movie = movieModelAssembler.toModel(adminService.getSingleMovie(movieId));
         movie.add(linkTo(methodOn(AdminController.class).getSingleMovie(movie.getId())).withSelfRel());
-        movie.add(linkTo(methodOn(AdminController.class).getScreeningPageByMovieId(0, 20, movie.getId(), null)).withRel("movie"));
+        movie.add(linkTo(methodOn(AdminController.class).getScreeningPageByMovieId(0, 20, movie.getId(), "")).withRel("movie"));
         return movie;
     }
+
     @GetMapping("screenings")
-    public PagedModel<ScreeningModelDto> getScreeningPage(@RequestParam(defaultValue = "0",required = false) int page, @RequestParam(required = false,defaultValue = defaultPageSize) int size, @RequestParam(required = false,defaultValue = "screenTime") String sort) throws CustomCinemaException {
+    public PagedModel<ScreeningModelDto> getScreeningPage(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(required = false, defaultValue = defaultPageSize) int size, @RequestParam(required = false, defaultValue = "screenTime") String sort) throws CustomCinemaException {
         Page<Screening> screeningPage = adminService.getScreeningPage(page, size, sort.split(",")[0]);
         PagedModel<ScreeningModelDto> screenings = pagedScreeningMovieResourcesAssembler.toModel(screeningPage, screeningModelAssembler);
         for (ScreeningModelDto screening : screenings) {
@@ -191,6 +199,7 @@ public class AdminController {
         }
         return screenings;
     }
+
     @GetMapping("screenings/{screeningId}")
     ScreeningModelDto getSingleScreening(@PathVariable String screeningId) throws CustomCinemaException {
         ScreeningModelDto screening = screeningModelAssembler.toModel(adminService.getSingleScreening(screeningId));
@@ -198,8 +207,9 @@ public class AdminController {
         screening.add(linkTo(methodOn(AdminController.class).getSingleMovie(screening.getMovieId())).withRel("movie"));
         return screening;
     }
+
     @GetMapping("tickets")
-    PagedModel<TicketModelDto> getPurchasePage(@RequestParam(defaultValue = "0",required = false) int page, @RequestParam(required = false,defaultValue = defaultPageSize) int size, @RequestParam(required = false,defaultValue = "purchaseTime") String sort) throws CustomCinemaException {
+    PagedModel<TicketModelDto> getPurchasePage(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(required = false, defaultValue = defaultPageSize) int size, @RequestParam(required = false, defaultValue = "purchaseTime") String sort) throws CustomCinemaException {
         Page<Purchase> purchasePage = adminService.getPurchasePage(page, size, sort.split(",")[0]);
         PagedModel<TicketModelDto> tickets = pagedPurchaseResourcesAssembler.toModel(purchasePage, ticketModelAssembler);
         for (TicketModelDto ticket : tickets) {
@@ -208,6 +218,7 @@ public class AdminController {
         }
         return tickets;
     }
+
     @GetMapping("tickets/{purchaseId}")
     TicketModelDto getSinglePurchase(@PathVariable String purchaseId) throws CustomCinemaException {
         TicketModelDto ticket = ticketModelAssembler.toModel(adminService.getSinglePurchase(purchaseId));

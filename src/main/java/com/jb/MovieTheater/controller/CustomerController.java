@@ -15,7 +15,6 @@ import com.jb.MovieTheater.models.ticket.TicketModelDto;
 import com.jb.MovieTheater.models.user.CustomerModelDto;
 import com.jb.MovieTheater.services.CustomerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
@@ -45,7 +44,7 @@ public class CustomerController {
     private final CustomerModelAssembler customerModelAssembler;
     private final MovieModelAssembler movieModelAssembler;
     private final ScreeningModelAssembler screeningModelAssembler;
-    private final String defaultPageSize="5";
+    private final String defaultPageSize = "5";
 
     @PostMapping("purchases")
     @ResponseStatus(HttpStatus.CREATED)
@@ -84,7 +83,7 @@ public class CustomerController {
     public CustomerModelDto getCustomerDetails(Authentication authentication) throws CustomCinemaException {
         CustomerModelDto customerDetails = customerModelAssembler.toModel(customerService.getCustomerDetails(Integer.parseInt(authentication.getName())));
         customerDetails.add(linkTo(methodOn(CustomerController.class).getCustomerDetails(authentication)).withSelfRel());
-        customerDetails.add(linkTo(methodOn(CustomerController.class).findAllUserTickets(authentication,0,5)).withRel("tickets"));
+        customerDetails.add(linkTo(methodOn(CustomerController.class).findAllUserTickets(authentication, 0, 5)).withRel("tickets"));
         return customerDetails;
     }
 
@@ -102,13 +101,13 @@ public class CustomerController {
     public MovieModelDto getSingleMovie(@PathVariable String movieId) throws CustomCinemaException {
         MovieModelDto movie = movieModelAssembler.toModel(customerService.getSingleMovie(movieId));
         movie.add(linkTo(methodOn(CustomerController.class).getSingleMovie(movie.getId())).withSelfRel());
-        movie.add(linkTo(methodOn(CustomerController.class).getActiveScreeningsPageByMovie(0, 20, movie.getName(), "")).withRel("screenings"));
+        movie.add(linkTo(methodOn(CustomerController.class).getActiveScreeningsPageByMovie(0, 20, movie.getId(), "")).withRel("screenings"));
         return movie;
     }
 
     @GetMapping("screenings")
     public PagedModel<ScreeningModelDto> getActiveScreeningsPage(@RequestParam(defaultValue = "0", required = false) int page, @RequestParam(defaultValue = defaultPageSize, required = false) int size, @RequestParam(defaultValue = "screenTime", required = false) String sort) throws CustomCinemaException {
-        Page<Screening> screeningsPage = customerService.getActiveScreeningsPage(page, size,  sort.split(",")[0]);
+        Page<Screening> screeningsPage = customerService.getActiveScreeningsPage(page, size, sort.split(",")[0]);
         PagedModel<ScreeningModelDto> pagedModel = pagedScreeningMovieResourcesAssembler.toModel(screeningsPage, screeningModelAssembler);
         for (ScreeningModelDto screening : pagedModel) {
             screening.add(linkTo(methodOn(CustomerController.class).getSingleScreening(screening.getId())).withSelfRel());

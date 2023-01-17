@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -38,6 +39,7 @@ public class AdminServiceImpl implements AdminService {
     private final ClerkRepository clerkRepository;
     private final CustomerRepository customerRepository;
     private final PurchaseRepository purchaseRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
     @Override
@@ -69,7 +71,7 @@ public class AdminServiceImpl implements AdminService {
             throw new CustomCinemaException(CinemaExceptionEnum.MOVIE_IS_INACTIVE);
         }
         Instant time = screening.getScreenTime();
-        Movie movie=movieRepository.getMovieDurationAndIdByName(screening.getMovieName());
+        Movie movie = movieRepository.getMovieDurationAndIdByName(screening.getMovieName());
         int minutes = movie.getDuration();
         if (time.isBefore(Instant.now())) {
             throw new CustomCinemaException(CinemaExceptionEnum.INVALID_SCREENING_DATE);
@@ -85,7 +87,7 @@ public class AdminServiceImpl implements AdminService {
 
         return screeningRepository.save(Screening.builder()
                 .duration(minutes)
-                        .movieId(movie.getId())
+                .movieId(movie.getId())
                 .movieName(screening.getMovieName())
                 .seats(rows)
                 .screenTime(screening.getScreenTime())
@@ -101,7 +103,7 @@ public class AdminServiceImpl implements AdminService {
             throw new CustomCinemaException(CinemaExceptionEnum.EMAIL_IN_USE);
         return clerkRepository.save(Clerk.builder()
                 .email(clerk.getEmailAddress())
-                .password(clerk.getPassword())
+                .password(bCryptPasswordEncoder.encode(clerk.getPassword()))
                 .name(clerk.getClerkName())
                 .build());
     }
@@ -172,17 +174,17 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<Customer> getCustomerPage(int page,int pageSize, String sortBy) {
+    public Page<Customer> getCustomerPage(int page, int pageSize, String sortBy) {
         return customerRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
     @Override
     public Customer getSingleCustomer(int customerId) throws CustomCinemaException {
-        return customerRepository.findById(customerId).orElseThrow(()->new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND));
+        return customerRepository.findById(customerId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND));
     }
 
     @Override
-    public Page<Clerk> getClerksPage(int page,int pageSize, String sortBy) {
+    public Page<Clerk> getClerksPage(int page, int pageSize, String sortBy) {
         return clerkRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
@@ -193,13 +195,13 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<Movie> getMoviePage(int page,int pageSize, String sortBy) {
+    public Page<Movie> getMoviePage(int page, int pageSize, String sortBy) {
         return movieRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
     @Override
     public Page<Screening> getScreeningsPageByMovie(int page, int pageSize, String movieId, String sortBy) {
-        return screeningRepository.findAllByMovieId(movieId,PageRequest.of(page,pageSize,Sort.by(sortBy)));
+        return screeningRepository.findAllByMovieId(movieId, PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
     @Override
@@ -208,7 +210,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<Screening> getScreeningPage(int page,int pageSize, String sortBy) {
+    public Page<Screening> getScreeningPage(int page, int pageSize, String sortBy) {
         return screeningRepository
                 .findAll(PageRequest.of(page, pageSize, Sort.by(sortBy).descending()));
     }
@@ -220,12 +222,12 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Page<Purchase> getPurchasePage(int page, int pageSize, String sortBy) {
-        return purchaseRepository.findAll(PageRequest.of(page,pageSize,Sort.by(sortBy)));
+        return purchaseRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
     @Override
     public Purchase getSinglePurchase(String purchaseId) throws CustomCinemaException {
-        return purchaseRepository.findById(purchaseId).orElseThrow(()->new CustomCinemaException(CinemaExceptionEnum.PURCHASE_DOESNT_EXIST));
+        return purchaseRepository.findById(purchaseId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.PURCHASE_DOESNT_EXIST));
     }
 
 }

@@ -35,24 +35,27 @@ public interface AdminService {
 
     void deleteClerk(int clerkId) throws CustomCinemaException;
 
-    Page<Customer> getCustomerPage(int page,int pageSize, String sortBy);
+    Page<Customer> getCustomerPage(int page, int pageSize, String sortBy);
+
     Customer getSingleCustomer(int customerId) throws CustomCinemaException;
 
 
-    Page<Clerk> getClerksPage(int page,int pageSize, String sortBy);
+    Page<Clerk> getClerksPage(int page, int pageSize, String sortBy);
 
     Clerk getSingleClerk(int clerkId) throws CustomCinemaException;
 
-    Page<Movie> getMoviePage(int page,int pageSize, String sortBy);
-    Page<Screening> getScreeningsPageByMovie(int page,int pageSize, String movieId, String sortBy);
+    Page<Movie> getMoviePage(int page, int pageSize, String sortBy);
+
+    Page<Screening> getScreeningsPageByMovie(int page, int pageSize, String movieId, String sortBy);
 
 
     Movie getSingleMovie(String movieId) throws CustomCinemaException;
 
-    Page<Screening> getScreeningPage(int page,int pageSize, String sortBy);
+    Page<Screening> getScreeningPage(int page, int pageSize, String sortBy);
 
     Screening getSingleScreening(String screeningId) throws CustomCinemaException;
 
-    Page<Purchase> getPurchasePage(int page,int pageSize, String sortBy);
+    Page<Purchase> getPurchasePage(int page, int pageSize, String sortBy);
+
     Purchase getSinglePurchase(String purchaseId) throws CustomCinemaException;
 }

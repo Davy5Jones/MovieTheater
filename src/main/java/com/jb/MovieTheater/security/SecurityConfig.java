@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .mvcMatchers("home/**").permitAll()
                         .mvcMatchers("api/clerk/**").hasAuthority("SCOPE_ROLE_CLERK")
-                        .mvcMatchers("api/customer/**").hasAnyAuthority("SCOPE_ROLE_CUSTOMER","SCOPE_ROLE_CLERK")
+                        .mvcMatchers("api/customer/**").hasAnyAuthority("SCOPE_ROLE_CUSTOMER", "SCOPE_ROLE_CLERK")
                         .mvcMatchers("api/admin/**").hasAuthority("SCOPE_ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )

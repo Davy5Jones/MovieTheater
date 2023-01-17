@@ -1,6 +1,5 @@
 package com.jb.MovieTheater.security;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
@@ -21,12 +20,12 @@ public class TokenService {
         this.encoder = encoder;
     }
 
-    public String generateToken(Authentication authentication,boolean stay) {
+    public String generateToken(Authentication authentication, boolean stay) {
         Instant expire;
-        if (stay){
-            expire = Instant.now().plus(30,ChronoUnit.DAYS);
-        }else {
-            expire = Instant.now().plus(1,ChronoUnit.HOURS);
+        if (stay) {
+            expire = Instant.now().plus(30, ChronoUnit.DAYS);
+        } else {
+            expire = Instant.now().plus(1, ChronoUnit.HOURS);
         }
         String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

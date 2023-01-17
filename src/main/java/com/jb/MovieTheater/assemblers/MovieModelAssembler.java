@@ -1,14 +1,12 @@
 package com.jb.MovieTheater.assemblers;
 
 import com.jb.MovieTheater.beans.mongo.Movie;
-import com.jb.MovieTheater.beans.mongo.Purchase;
 import com.jb.MovieTheater.models.movie.MovieModelDto;
-import com.jb.MovieTheater.models.ticket.TicketModelDto;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.stereotype.Component;
 
 @Component
-public class MovieModelAssembler  extends RepresentationModelAssemblerSupport<Movie, MovieModelDto> {
+public class MovieModelAssembler extends RepresentationModelAssemblerSupport<Movie, MovieModelDto> {
 
 
     public MovieModelAssembler() {

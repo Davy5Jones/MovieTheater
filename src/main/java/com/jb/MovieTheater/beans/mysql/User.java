@@ -17,6 +17,7 @@ import javax.validation.constraints.Pattern;
 @AllArgsConstructor
 @NoArgsConstructor
 @MappedSuperclass
+@SuperBuilder
 public abstract class User extends SuperBean {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

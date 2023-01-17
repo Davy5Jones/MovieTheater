@@ -5,18 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.Optional;
 
+@Repository
 public interface ScreeningRepository extends MongoRepository<Screening, String>, ScreeningRepositoryTemplate {
-
-    @Query(value = "{ _id : ?0}", fields = "{ screenTime: 1,movieId: 1,theater: 1,duration: 1,movieName : 1}")
-    Optional<Screening> getScreeningTimeStampAndMovieIdAndTheaterAndDuration(String screeningId);
-
-
-    @Query(value = "{screenTime:{ $gt: ?0, $lt: ?1 },isActive:true}")
-    Page<Screening> findScreeningsByScreenTimeBetweenAndActive(Instant after, Instant before, Pageable pageable);
 
     boolean existsByTheaterIdAndScreenTimeBetween(String theaterId, Instant before, Instant after);
 
@@ -32,5 +27,5 @@ public interface ScreeningRepository extends MongoRepository<Screening, String>,
     @Query(value = "{ movieId: ?0, isActive : true}", exists = true)
     boolean existsByMovieIdAndActive(String movieId);
 
-    Page<Screening> findAllByMovieId(String movieId,Pageable pageable);
+    Page<Screening> findAllByMovieId(String movieId, Pageable pageable);
 }

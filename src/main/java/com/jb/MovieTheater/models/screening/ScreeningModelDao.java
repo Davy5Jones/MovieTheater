@@ -1,12 +1,11 @@
 package com.jb.MovieTheater.models.screening;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.jb.MovieTheater.beans.mongo.Movie;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Date;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 
@@ -14,8 +13,11 @@ import java.time.Instant;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScreeningModelDao {
+    @NotBlank(message = "Movie name cannot be empty!")
     private String movieName;
+    @NotNull(message = "screening must contain screening time")
     private Instant screenTime;
+    @NotBlank(message = "must contain theaterId")
     private String theaterId;
     private boolean is3D;
 }

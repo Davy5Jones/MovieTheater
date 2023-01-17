@@ -1,15 +1,14 @@
 package com.jb.MovieTheater.redis;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jb.MovieTheater.models.movie.MovieModelDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.*;
-import org.springframework.context.annotation.*;
-import org.springframework.data.redis.cache.*;
-import org.springframework.data.redis.serializer.*;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.RedisSerializationContext;
 
-import java.time.*;
-import java.util.ArrayList;
+import java.time.Duration;
 
 @Configuration
 @EnableCaching
@@ -23,8 +22,6 @@ public class RedisCacheConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair
                         .fromSerializer(new GenericJackson2JsonRedisSerializer()));
     }
-
-
 
 
 }

@@ -29,7 +29,6 @@ public class ClerkController {
     private final ClerkModelAssembler clerkModelAssembler;
 
 
-
     @PutMapping("purchases/{purchaseId}")
     public TicketModelDto invalidatePurchase(@PathVariable String purchaseId) throws CustomCinemaException {
         TicketModelDto ticketModelDto = ticketModelAssembler.toModel(clerkService.invalidatePurchase(purchaseId));
@@ -53,8 +52,9 @@ public class ClerkController {
         }
         return pagedModel;
     }
+
     @GetMapping
-    public ClerkModelDto getClerkDetails(Authentication authentication) throws CustomCinemaException{
+    public ClerkModelDto getClerkDetails(Authentication authentication) throws CustomCinemaException {
         return clerkModelAssembler.toModel(clerkService.getClerkDetails(Integer.parseInt(authentication.getName())));
     }
 

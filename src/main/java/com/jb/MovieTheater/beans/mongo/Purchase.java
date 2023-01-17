@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.MongoId;
 
-import javax.persistence.Id;
 import java.time.Instant;
 
 @Document("purchases")
@@ -32,5 +31,6 @@ public class Purchase {
         this.purchaseTime = purchaseTime;
         this.rowId = rowId;
         this.seatId = seatId;
+        this.used=used;
     }
 }

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ScreeningModelAssembler extends RepresentationModelAssemblerSupport<Screening, ScreeningModelDto> {
     private final TheaterRepository theaterRepository;
+
     public ScreeningModelAssembler(TheaterRepository theaterRepository) {
         super(Screening.class, ScreeningModelDto.class);
         this.theaterRepository = theaterRepository;
@@ -18,7 +19,7 @@ public class ScreeningModelAssembler extends RepresentationModelAssemblerSupport
     public ScreeningModelDto toModel(Screening screening) {
         return new ScreeningModelDto(screening.getId(),
                 screening.getMovieId(), screening.getMovieName(),
-                screening.getScreenTime(), theaterRepository.getTheaterNameById(screening.getTheaterId()), screening.is3D(), screening.isActive());
+                screening.getScreenTime(), screening.getSeats(), theaterRepository.getTheaterNameById(screening.getTheaterId()), screening.is3D(), screening.isActive());
 
     }
 }

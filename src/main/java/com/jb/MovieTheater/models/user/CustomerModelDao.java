@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class CustomerModelDao{
+public class CustomerModelDao {
 
     @Email(regexp = "[A-Za-z0-9._%-+]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}",
             flags = Pattern.Flag.CASE_INSENSITIVE, message = "Invalid email address")

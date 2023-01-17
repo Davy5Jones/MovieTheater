@@ -23,7 +23,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("api")
+@RequestMapping("home")
 public class HomeController {
     private static final Logger LOG = LoggerFactory.getLogger(HomeController.class);
     private final AuthenticationManager clerkAuthenticationManager;
@@ -50,8 +50,8 @@ public class HomeController {
 
     @PostMapping("login/clerk")
     public String clerkLogin(@RequestBody LoginBodyModel userLogin) {
-        LOG.debug("Login requested for company: '{}'", userLogin.getEmail());
-        Authentication authentication = clerkAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_COMPANY"))));
+        LOG.debug("Login requested for CLERK: '{}'", userLogin.getEmail());
+        Authentication authentication = clerkAuthenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(), userLogin.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_CLERK"))));
         return tokenService.generateToken(authentication, userLogin.isStayLoggedIn());
     }
 

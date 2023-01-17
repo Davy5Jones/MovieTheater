@@ -29,7 +29,7 @@ public class TicketModelAssembler extends RepresentationModelAssemblerSupport<Pu
         Screening screening = screeningRepository.findById(purchase.getScreeningId()).get();
         int duration = screening.getDuration();
         String email = customerRepository.getEmailById(purchase.getUserId());
-        return new TicketModelDto(purchase.getId(), screening.getScreenTime(),purchase.getPurchaseTime()
+        return new TicketModelDto(purchase.getId(), screening.getScreenTime(), purchase.getPurchaseTime()
                 , duration, theaterRepository.getTheaterNameById(screening.getTheaterId())
                 , email, purchase.getUserId(), screening.getMovieName()
                 , purchase.getRowId(), purchase.getSeatId(), purchase.isUsed());
