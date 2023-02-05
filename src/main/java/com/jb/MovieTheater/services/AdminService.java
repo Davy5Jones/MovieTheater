@@ -12,6 +12,9 @@ import com.jb.MovieTheater.models.screening.ScreeningModelDao;
 import com.jb.MovieTheater.models.theater.TheaterModelDao;
 import com.jb.MovieTheater.models.user.ClerkModelDao;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+
+import java.util.List;
 
 public interface AdminService {
 
@@ -35,27 +38,31 @@ public interface AdminService {
 
     void deleteClerk(int clerkId) throws CustomCinemaException;
 
-    Page<Customer> getCustomerPage(int page, int pageSize, String sortBy);
+    Page<Customer> getCustomerPage(int page, int pageSize, String sortBy,Sort.Direction order);
 
     Customer getSingleCustomer(int customerId) throws CustomCinemaException;
 
 
-    Page<Clerk> getClerksPage(int page, int pageSize, String sortBy);
+    Page<Clerk> getClerksPage(int page, int pageSize, String sortBy,Sort.Direction order);
 
     Clerk getSingleClerk(int clerkId) throws CustomCinemaException;
 
-    Page<Movie> getMoviePage(int page, int pageSize, String sortBy);
+    Page<Movie> getMoviePage(int page, int pageSize, String sortBy,Sort.Direction order);
 
-    Page<Screening> getScreeningsPageByMovie(int page, int pageSize, String movieId, String sortBy);
+    Page<Screening> getActiveScreeningsPageByMovie(int page, int pageSize, String movieId, String sortBy, Sort.Direction order);
 
 
     Movie getSingleMovie(String movieId) throws CustomCinemaException;
 
-    Page<Screening> getScreeningPage(int page, int pageSize, String sortBy);
+    Page<Screening> getScreeningPage(int page, int pageSize, String sortBy, Sort.Direction order);
 
     Screening getSingleScreening(String screeningId) throws CustomCinemaException;
 
-    Page<Purchase> getPurchasePage(int page, int pageSize, String sortBy);
+    Page<Purchase> getPurchasePage(int page, int pageSize, String sortBy,Sort.Direction order);
+    Page<Purchase> getPurchasePageByCustomer(int customerId,int page, int pageSize, String sortBy,Sort.Direction order);
+
 
     Purchase getSinglePurchase(String purchaseId) throws CustomCinemaException;
+
+    List<String> getTheaterNames();
 }

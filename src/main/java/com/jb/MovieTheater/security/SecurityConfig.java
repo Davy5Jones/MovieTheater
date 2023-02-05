@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -22,20 +23,27 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
+import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.util.StringUtils;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import javax.servlet.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @PropertySource("classpath:admin.properties")
-
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -57,7 +65,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable()
+        return http.cors().and().csrf().disable()
                 .authorizeHttpRequests(auth -> auth
                         .mvcMatchers("home/**").permitAll()
                         .mvcMatchers("api/clerk/**").hasAuthority("SCOPE_ROLE_CLERK")
@@ -66,16 +74,50 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 // This enables our JWT Authentication
-                .oauth2ResourceServer(oAuth2 -> oAuth2.jwt(jwtConfigurer -> {
-                    try {
-                        jwtDecoder();
-                    } catch (JOSEException e) {
-                        throw new RuntimeException(e);
-                    }
-                }))
-                // Session management is set to stateless because JsonWebTokens are used
+                .oauth2ResourceServer(oath->{
+                    oath.bearerTokenResolver(request -> {
+                        try {
+                            return attemptAuthentication(request);
+                        } catch (JOSEException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }).jwt(jwtConfigurer -> {
+                        try {
+                            jwtDecoder();
+                        } catch (JOSEException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
+    }
+
+    public String attemptAuthentication(HttpServletRequest request) throws AuthenticationException, JOSEException {
+        // get token from a Cookie
+        if (request.getRequestURI().contains("home")){
+            return null;
+        }
+        Cookie[] cookies = request.getCookies();
+
+
+        if( cookies == null || cookies.length < 1 ) {
+            return null;
+        }
+        System.out.println(cookies.length);
+        Cookie sessionCookie = null;
+        for( Cookie cookie : cookies ) {
+            if( ( "movieSessionId" ).equals( cookie.getName() ) ) {
+                sessionCookie = cookie;
+                break;
+            }
+        }
+
+        // TODO: move the cookie validation into a private method
+        if( sessionCookie == null || StringUtils.isEmpty( sessionCookie.getValue() ) ) {
+            return null;
+        }
+        return sessionCookie.getValue();
     }
 
     @Bean
@@ -96,7 +138,7 @@ public class SecurityConfig {
                 String passw = authentication.getCredentials().toString();
                 String ema = authentication.getName();
                 if (!Objects.equals(passw, password) || !Objects.equals(ema, email)) {
-                    return null;
+                    throw  new UsernameNotFoundException("Username not found: " + email);
                 }
                 List<GrantedAuthority> list = new ArrayList<>();
                 list.add(new SimpleGrantedAuthority(("ROLE_ADMIN")));
@@ -146,6 +188,23 @@ public class SecurityConfig {
     @Bean
     public JwtDecoder jwtDecoder() throws JOSEException {
         return NimbusJwtDecoder.withPublicKey(rsaKey.toRSAPublicKey()).build();
+    }
+
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry
+                        .addMapping("/**")
+                        .allowedMethods(CorsConfiguration.ALL)
+                        .allowedHeaders(CorsConfiguration.ALL)
+                        .allowCredentials(true)
+                        .allowedOriginPatterns(CorsConfiguration.ALL);
+            }
+        };
     }
 }
 

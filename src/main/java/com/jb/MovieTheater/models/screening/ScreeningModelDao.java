@@ -9,15 +9,15 @@ import javax.validation.constraints.NotNull;
 import java.time.Instant;
 
 
-@Data
-@AllArgsConstructor
+@Data@AllArgsConstructor
 @NoArgsConstructor
 public class ScreeningModelDao {
-    @NotBlank(message = "Movie name cannot be empty!")
-    private String movieName;
+    @NotBlank(message = "Movie Id cannot be empty!")
+    private String movieId;
     @NotNull(message = "screening must contain screening time")
     private Instant screenTime;
-    @NotBlank(message = "must contain theaterId")
-    private String theaterId;
-    private boolean is3D;
+    @NotBlank(message = "must contain theater name")
+    private String theaterName;
+    private boolean threeD;
+    private boolean active;
 }

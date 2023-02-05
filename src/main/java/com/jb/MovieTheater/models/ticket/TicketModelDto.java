@@ -19,8 +19,8 @@ public class TicketModelDto extends RepresentationModel<TicketModelDto> {
     private Instant purchaseTime;
     private int duration;
     private String theaterName;
-    private String userEmail;
     private int userId;
+    private String userEmail;
     private String movieName;
     private int rowId;
     private int seatId;

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -14,4 +16,6 @@ public class CustomerModelDto extends SuperBean {
     private int id;
     private String emailAddress;
     private String customerName;
+    private Instant registered;
+    private Instant lastSeen;
 }

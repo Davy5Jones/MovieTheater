@@ -12,13 +12,14 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
+import java.time.Instant;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @MappedSuperclass
 @SuperBuilder
-public abstract class User extends SuperBean {
+public abstract class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
@@ -31,7 +32,6 @@ public abstract class User extends SuperBean {
     @NotBlank(message = "Password is required")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-
     @Transient
     @JsonIgnore
     private final String roles = "ROLE_" + this.getClass().getSimpleName().toUpperCase();

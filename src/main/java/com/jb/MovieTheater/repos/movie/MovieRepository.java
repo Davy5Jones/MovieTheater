@@ -17,8 +17,8 @@ public interface MovieRepository extends MongoRepository<Movie, String>, MovieRe
 
     boolean existsByNameAndId(String name, String movieId);
 
-    @Query(value = "{ name : ?0, isActive : true}", exists = true)
-    boolean getMovieIsActiveByName(String movieName);
+    @Query(value = "{ id : ?0, isActive : true}", exists = true)
+    boolean getMovieIsActiveById(String movieId);
 
     List<Movie> findTop5ByIsActiveOrderByRatingDesc(boolean is);
 

@@ -27,13 +27,17 @@ public class Movie {
     private Category category;
     private float rating;
     private boolean isActive;
+    private String img;
+    private String trailer;
 
-    public Movie(String name, String description, int duration, Category category, float rating, boolean isActive) {
+    public Movie(String name, String description, int duration, Category category, float rating, boolean isActive,String img,String trailer) {
         this.name = name;
         this.description = description;
         this.duration = duration;
         this.category = category;
         this.rating = rating;
         this.isActive = isActive;
+        this.img=img;
+        this.trailer=trailer;
     }
 }

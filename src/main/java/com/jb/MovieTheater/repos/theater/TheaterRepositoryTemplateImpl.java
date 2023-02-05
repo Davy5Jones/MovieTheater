@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Repository
 public class TheaterRepositoryTemplateImpl implements TheaterRepositoryTemplate {
@@ -24,5 +26,12 @@ public class TheaterRepositoryTemplateImpl implements TheaterRepositoryTemplate 
             return "";
         }
         return theater.getName();
+    }
+
+    @Override
+    public List<Theater> getAllNames() {
+        Query query = new Query();
+        query.fields().include("name");
+        return mongoTemplate.find(query, Theater.class);
     }
 }

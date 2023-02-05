@@ -23,6 +23,8 @@ public class MovieModelAssembler extends RepresentationModelAssemblerSupport<Mov
                 .duration(movie.getDuration())
                 .name(movie.getName())
                 .isActive(movie.isActive())
+                .img(movie.getImg())
+                .trailer(movie.getTrailer())
                 .build();
     }
 }

@@ -29,5 +29,11 @@ public class MovieModelDao {
     @Min(value = 1, message = "rating cannot be negative...")
     @Max(value = 5, message = "rating maximum is 5")
     private float rating;
+    @NotBlank(message = "image cannot be empty!")
+
+    private String img;
+    @NotBlank(message = "trailer cannot be empty!")
+
+    private String trailer;
 
 }

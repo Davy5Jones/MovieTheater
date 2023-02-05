@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface MovieRepositoryTemplate {
     Optional<Movie> inactivateMovie(String movieId) throws CustomCinemaException;
 
-    Movie getMovieDurationAndIdByName(String movieName) throws CustomCinemaException;
+    Movie getMovieDurationAndNameById(String movieName) throws CustomCinemaException;
 
     String getMovieName(String movieId) throws CustomCinemaException;
 

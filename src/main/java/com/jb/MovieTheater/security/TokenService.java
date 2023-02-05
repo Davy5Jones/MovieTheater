@@ -25,7 +25,7 @@ public class TokenService {
         if (stay) {
             expire = Instant.now().plus(30, ChronoUnit.DAYS);
         } else {
-            expire = Instant.now().plus(1, ChronoUnit.HOURS);
+            expire = Instant.now().plus(24, ChronoUnit.HOURS);
         }
         String scope = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)

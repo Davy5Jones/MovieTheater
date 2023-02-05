@@ -14,13 +14,11 @@ import org.springframework.stereotype.Component;
 //todo maybe add screening id to add link
 public class TicketModelAssembler extends RepresentationModelAssemblerSupport<Purchase, TicketModelDto> {
     private final ScreeningRepository screeningRepository;
-    private final CustomerRepository customerRepository;
     private final TheaterRepository theaterRepository;
 
     public TicketModelAssembler(ScreeningRepository screeningRepository, CustomerRepository customerRepository, TheaterRepository theaterRepository) {
         super(Purchase.class, TicketModelDto.class);
         this.screeningRepository = screeningRepository;
-        this.customerRepository = customerRepository;
         this.theaterRepository = theaterRepository;
     }
 
@@ -28,10 +26,9 @@ public class TicketModelAssembler extends RepresentationModelAssemblerSupport<Pu
     public TicketModelDto toModel(Purchase purchase) {
         Screening screening = screeningRepository.findById(purchase.getScreeningId()).get();
         int duration = screening.getDuration();
-        String email = customerRepository.getEmailById(purchase.getUserId());
         return new TicketModelDto(purchase.getId(), screening.getScreenTime(), purchase.getPurchaseTime()
-                , duration, theaterRepository.getTheaterNameById(screening.getTheaterId())
-                , email, purchase.getUserId(), screening.getMovieName()
+                , duration, theaterRepository.getTheaterNameById(screening.getTheaterId()),purchase.getUserId()
+                , purchase.getUserEmail(), screening.getMovieName()
                 , purchase.getRowId(), purchase.getSeatId(), purchase.isUsed());
     }
 }

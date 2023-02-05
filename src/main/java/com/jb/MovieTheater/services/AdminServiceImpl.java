@@ -59,41 +59,41 @@ public class AdminServiceImpl implements AdminService {
         if (movieRepository.existsByName(movie.getName())) {
             throw new CustomCinemaException(CinemaExceptionEnum.NAME_ALREADY_INUSE);
         }
-        return movieRepository.save(new Movie(movie.getName(), movie.getDescription(), movie.getDuration(), movie.getCategory(), movie.getRating(), true));
+        return movieRepository.save(new Movie(movie.getName(), movie.getDescription(), movie.getDuration(), movie.getCategory(), movie.getRating(), true, movie.getImg(), movie.getTrailer()));
     }
 
     @Override
     public Screening addScreening(ScreeningModelDao screening) throws CustomCinemaException {
-        if (!movieRepository.existsByName(screening.getMovieName())) {
+        if (!movieRepository.existsById(screening.getMovieId())) {
             throw new CustomCinemaException(CinemaExceptionEnum.MOVIE_DOESNT_EXIST);
         }
-        if (!movieRepository.getMovieIsActiveByName(screening.getMovieName())) {
+        if (!movieRepository.getMovieIsActiveById(screening.getMovieId())) {
             throw new CustomCinemaException(CinemaExceptionEnum.MOVIE_IS_INACTIVE);
         }
         Instant time = screening.getScreenTime();
-        Movie movie = movieRepository.getMovieDurationAndIdByName(screening.getMovieName());
+        Movie movie = movieRepository.getMovieDurationAndNameById(screening.getMovieId());
         int minutes = movie.getDuration();
         if (time.isBefore(Instant.now())) {
             throw new CustomCinemaException(CinemaExceptionEnum.INVALID_SCREENING_DATE);
         }
         Instant start = time.minusSeconds(60 * 150);
         Instant end = time.plusSeconds(minutes * 60L + 60 * 10);
-        List<boolean[]> rows = theaterRepository.getTheaterRows(screening.getTheaterId())
-                .orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.THEATER_DOESNT_EXIST)).getRows()
+        Theater theater = theaterRepository.getTheaterRowsAndIdByName(screening.getTheaterName()).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.THEATER_DOESNT_EXIST));
+        List<boolean[]> rows = theater.getRows()
                 .stream().map(boolean[]::new).collect(Collectors.toList());
-        if (screeningRepository.existsByTheaterIdAndScreenTimeBetween(screening.getTheaterId(), start, end)) {
+        if (screeningRepository.existsByTheaterIdAndScreenTimeBetween(theater.getId(), start, end)) {
             throw new CustomCinemaException(CinemaExceptionEnum.THEATER_IN_USE);
         }
 
         return screeningRepository.save(Screening.builder()
                 .duration(minutes)
-                .movieId(movie.getId())
-                .movieName(screening.getMovieName())
+                .movieId(screening.getMovieId())
+                .movieName(movie.getName())
                 .seats(rows)
                 .screenTime(screening.getScreenTime())
-                .theaterId(screening.getTheaterId())
-                .is3D(screening.is3D())
-                .isActive(true)
+                .theaterId(theater.getId())
+                .is3D(screening.isThreeD())
+                .active(screening.isActive())
                 .build());
     }
 
@@ -115,6 +115,9 @@ public class AdminServiceImpl implements AdminService {
         }
         if (theaterRepository.existsByNameAndIdNot(theater.getName(), theaterId)) {
             throw new CustomCinemaException(CinemaExceptionEnum.NAME_ALREADY_INUSE);
+        }
+        if (screeningRepository.existsByTheaterAndActive(theaterId)) {
+            throw new CustomCinemaException(CinemaExceptionEnum.THEATER_HAS_ACTIVE_SCREENINGS);
         }
 
         return theaterRepository.save(Theater.builder()
@@ -174,8 +177,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<Customer> getCustomerPage(int page, int pageSize, String sortBy) {
-        return customerRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
+    public Page<Customer> getCustomerPage(int page, int pageSize, String sortBy, Sort.Direction order) {
+        return customerRepository.findAll(PageRequest.of(page, pageSize, Sort.by(order, sortBy)));
     }
 
     @Override
@@ -184,7 +187,7 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<Clerk> getClerksPage(int page, int pageSize, String sortBy) {
+    public Page<Clerk> getClerksPage(int page, int pageSize, String sortBy, Sort.Direction order) {
         return clerkRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
     }
 
@@ -195,13 +198,14 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<Movie> getMoviePage(int page, int pageSize, String sortBy) {
-        return movieRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
+    public Page<Movie> getMoviePage(int page, int pageSize, String sortBy, Sort.Direction order) {
+        return movieRepository.findAll(PageRequest.of(page, pageSize, Sort.by(order, sortBy)));
     }
 
     @Override
-    public Page<Screening> getScreeningsPageByMovie(int page, int pageSize, String movieId, String sortBy) {
-        return screeningRepository.findAllByMovieId(movieId, PageRequest.of(page, pageSize, Sort.by(sortBy)));
+    public Page<Screening> getActiveScreeningsPageByMovie(int page, int pageSize, String movieId, String sortBy, Sort.Direction order) {
+
+        return screeningRepository.findAllByMovieIdAndActive(movieId, PageRequest.of(page, pageSize, Sort.by(order, sortBy)));
     }
 
     @Override
@@ -210,24 +214,36 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public Page<Screening> getScreeningPage(int page, int pageSize, String sortBy) {
+    public Page<Screening> getScreeningPage(int page, int pageSize, String sortBy, Sort.Direction order) {
+        System.out.println(order);
         return screeningRepository
-                .findAll(PageRequest.of(page, pageSize, Sort.by(sortBy).descending()));
+                .findAll(PageRequest.of(page, pageSize, Sort.by(order, sortBy)));
     }
 
     @Override
     public Screening getSingleScreening(String screeningId) throws CustomCinemaException {
-        return screeningRepository.findById(screeningId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.SCREENING_DOESNT_EXIST));
+        return screeningRepository.findById(screeningId)
+                .orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.SCREENING_DOESNT_EXIST));
     }
 
     @Override
-    public Page<Purchase> getPurchasePage(int page, int pageSize, String sortBy) {
-        return purchaseRepository.findAll(PageRequest.of(page, pageSize, Sort.by(sortBy)));
+    public Page<Purchase> getPurchasePage(int page, int pageSize, String sortBy, Sort.Direction order) {
+        return purchaseRepository.findAll(PageRequest.of(page, pageSize, Sort.by(order, sortBy)));
+    }
+
+    @Override
+    public Page<Purchase> getPurchasePageByCustomer(int customerId, int page, int pageSize, String sortBy, Sort.Direction order) {
+        return purchaseRepository.findAllByUserId(customerId, PageRequest.of(page, pageSize, Sort.by(order, sortBy)));
     }
 
     @Override
     public Purchase getSinglePurchase(String purchaseId) throws CustomCinemaException {
         return purchaseRepository.findById(purchaseId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.PURCHASE_DOESNT_EXIST));
+    }
+
+    @Override
+    public List<String> getTheaterNames() {
+        return theaterRepository.getAllNames().stream().map(Theater::getName).collect(Collectors.toList());
     }
 
 }

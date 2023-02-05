@@ -31,6 +31,5 @@ public interface CustomerService {
 
     Movie getSingleMovie(String movieId) throws CustomCinemaException;
 
-    //@Cacheable(value = "recommendedMovies")
     List<Movie> getRecommendedMovies();
 }

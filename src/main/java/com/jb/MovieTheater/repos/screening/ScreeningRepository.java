@@ -15,17 +15,20 @@ public interface ScreeningRepository extends MongoRepository<Screening, String>,
 
     boolean existsByTheaterIdAndScreenTimeBetween(String theaterId, Instant before, Instant after);
 
-    @Query(value = "{ _id : ?0, isActive : true}", exists = true)
+    @Query(value = "{ _id : ?0, active : true}", exists = true)
     boolean getScreeningActive(String screeningId);
 
-    @Query(value = "{isActive : true}")
+    @Query(value = "{active : true}")
     Page<Screening> findAllByActive(Pageable pageable);
 
-    @Query(value = "{isActive : true,movieId: ?0}")
+    @Query(value = "{active : true,movieId: ?0}")
     Page<Screening> findAllByActiveAndMovieId(String movieId, Pageable pageable);
 
-    @Query(value = "{ movieId: ?0, isActive : true}", exists = true)
+    @Query(value = "{ movieId: ?0, active : true}", exists = true)
     boolean existsByMovieIdAndActive(String movieId);
 
-    Page<Screening> findAllByMovieId(String movieId, Pageable pageable);
+    @Query(value = "{ theaterId: ?0, active : true}", exists = true)
+    boolean existsByTheaterAndActive(String theaterId);
+    @Query(value = "{ movieId: ?0, active : true}")
+    Page<Screening> findAllByMovieIdAndActive(String movieId, Pageable pageable);
 }

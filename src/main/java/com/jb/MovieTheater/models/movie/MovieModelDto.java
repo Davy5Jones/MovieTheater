@@ -20,4 +20,6 @@ public class MovieModelDto extends SuperBean {
     private Category category;
     private float rating;
     private boolean isActive;
+    private String img;
+    private String trailer;
 }

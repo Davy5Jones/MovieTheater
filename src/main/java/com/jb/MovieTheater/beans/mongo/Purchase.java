@@ -17,6 +17,8 @@ import java.time.Instant;
 public class Purchase {
     @MongoId
     private String id;
+    private String userEmail;
+
     private int userId;
     private String screeningId;
     private Instant purchaseTime;
@@ -25,12 +27,13 @@ public class Purchase {
 
     private boolean used;
 
-    public Purchase(int userId, String screeningId, Instant purchaseTime, int rowId, int seatId, boolean used) {
+    public Purchase(String userEmail, int userId, String screeningId, Instant purchaseTime, int rowId, int seatId, boolean used) {
+        this.userEmail = userEmail;
         this.userId = userId;
         this.screeningId = screeningId;
         this.purchaseTime = purchaseTime;
         this.rowId = rowId;
         this.seatId = seatId;
-        this.used=used;
+        this.used = used;
     }
 }

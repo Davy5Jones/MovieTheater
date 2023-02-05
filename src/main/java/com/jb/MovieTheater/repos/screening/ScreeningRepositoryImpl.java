@@ -22,7 +22,7 @@ public class ScreeningRepositoryImpl implements ScreeningRepositoryTemplate {
     public void inactivateOldScreenings() {
         Query query = new Query();
         query.addCriteria(Criteria.where("screenTime").lte(Instant.now()));
-        Update update = new Update().set("isActive", false);
+        Update update = new Update().set("active", false);
         mongoTemplate.updateMulti(query, update, Screening.class);
     }
 
@@ -30,7 +30,7 @@ public class ScreeningRepositoryImpl implements ScreeningRepositoryTemplate {
     public Optional<Screening> inactivateScreening(String screeningId) {
         Query query = new Query();
         query.addCriteria(Criteria.where("id").is(screeningId)).limit(1);
-        Update update = new Update().set("isActive", false);
+        Update update = new Update().set("active", false);
         return Optional.ofNullable(mongoTemplate.findAndModify(query, update, FindAndModifyOptions.options().returnNew(true), Screening.class));
     }
 

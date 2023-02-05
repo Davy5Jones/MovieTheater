@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface CustomerRepository extends JpaRepository<Customer, Integer> {
 
     @Query(value = "SELECT email FROM movietheater.customers where id=?", nativeQuery = true)
-    String getEmailById(int customerId);
+    Optional<String>  getEmailById(int customerId);
 
     boolean existsByEmail(String email);
 

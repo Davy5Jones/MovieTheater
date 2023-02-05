@@ -21,8 +21,8 @@ public class ScreeningModelDto extends SuperBean {
     private Instant screenTime;
     private List<boolean[]> seats;
     private String theaterName;
-    private boolean is3D;
-    private boolean isActive;
+    private boolean threeD;
+    private boolean active;
 
 
 }

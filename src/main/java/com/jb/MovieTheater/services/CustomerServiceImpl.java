@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Service
@@ -51,8 +52,8 @@ public class CustomerServiceImpl implements CustomerService {
         }
         screening.getSeats().get(ticket.getRowId())[ticket.getSeatId()] = true;
         screeningRepository.save(screening);
-
-        return purchaseRepository.save(new Purchase(customerId, ticket.getScreeningId(), Instant.now(), ticket.getRowId(), ticket.getSeatId(), false));
+        String email = customerRepository.getEmailById(customerId).orElseThrow(()-> new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND));
+        return purchaseRepository.save(new Purchase(email,customerId, ticket.getScreeningId(), Instant.now(), ticket.getRowId(), ticket.getSeatId(), false));
     }
 
     @Override
@@ -61,10 +62,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     }
 
-    @Override
+   @Override
     public Purchase findSingleUserTicket(String purchaseId, int userId) throws CustomCinemaException {
         Purchase purchase = purchaseRepository.findById(purchaseId).orElseThrow(() -> new CustomCinemaException(CinemaExceptionEnum.PURCHASE_DOESNT_EXIST));
-        if (purchase.getUserId() != userId) {
+        String email = customerRepository.getEmailById(userId).orElseThrow(()-> new CustomCinemaException(CinemaExceptionEnum.USER_NOT_FOUND));
+        if (!purchase.getUserEmail().equals(email)) {
             throw new CustomCinemaException(CinemaExceptionEnum.PURCHASE_OWNED_BY_ANOTHER_CUSTOMER);
         }
         return purchase;
